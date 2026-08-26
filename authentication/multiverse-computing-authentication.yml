@@ -1,0 +1,56 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.compactif.ai/authentication/
+docs: https://docs.compactif.ai/authentication/
+summary:
+  types:
+  - http
+  model: Single Bearer API key per account, issued from the CompactifAI Dashboard
+    (or via AWS Marketplace subscription through Multiverse IAM). No OAuth, no scopes,
+    no per-endpoint differentiation.
+schemes:
+- name: HTTPBearer
+  type: http
+  scheme: bearer
+  in: header
+  header: Authorization
+  format: 'Authorization: Bearer YOUR_API_KEY'
+  applied_to: all operations
+  sources:
+  - openapi/multiverse-computing-compactifai-openapi.yml
+  - https://docs.compactif.ai/authentication/
+key_issuance:
+  paths:
+  - name: Dashboard signup
+    url: https://auth.multiverseapp.ai/sign-up?redirect_url=https%3A%2F%2Fdashboard.compactif.ai%2F
+    steps:
+    - Create an account at dashboard.compactif.ai with an email address
+    - Add billing details and accept billing terms
+    - Add a payment method
+    - Copy the API key from the Manage API Keys tab
+    note: No AWS account required.
+  - name: AWS Marketplace subscription
+    url: https://aws.amazon.com/marketplace/pp/prodview-ce2dp5ibd7lli
+    steps:
+    - Subscribe on the AWS Marketplace listing (pay-as-you-go plan only)
+    - Complete the "Set up your account" registration form
+    - Await manual approval (documented as typically within 24 hours)
+    - Sign in to dashboard.compactif.ai via Multiverse IAM with an emailed one-time
+      passcode (OTP)
+    note: Approval is manual, so key issuance on this path is not self-service.
+key_policy:
+  tokens_per_account: 1
+  rotation: Self-service "Rotate key" in the Dashboard Manage API Keys tab
+  multi_user: Not supported per account; teammates must sign up separately or contact
+    support
+  compromise_procedure: Report through the technical support form (https://docs.compactif.ai/support-contact/)
+  source: https://docs.compactif.ai/authentication/
+errors:
+  '401': authentication_error — no Bearer token supplied, malformed token, or the
+    token is not associated with a valid user
+  source: https://docs.compactif.ai/error-handling/
+notes:
+- The OpenAPI document declares components.securitySchemes.HTTPBearer but sets no
+  top-level `security` requirement and no per-operation `security`, so the spec alone
+  does not show that auth is mandatory; the docs and a live 401 from GET
+  https://api.compactif.ai/v1/models both confirm it is.

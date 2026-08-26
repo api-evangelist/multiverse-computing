@@ -1,0 +1,123 @@
+generated: '2026-08-26'
+method: probed
+source: live GET of /.well-known/* on every apis.yml + OpenAPI servers host, 2026-08-26
+summary:
+  hosts_probed: 5
+  paths_probed_per_host: 6
+  documents_found: 0
+hosts:
+- host: api.compactif.ai
+  note: FastAPI/istio-envoy gateway returns JSON {"detail":"Not Found"} for every
+    /.well-known/ path.
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+- host: api-eu.compactif.ai
+  note: EU regional endpoint; same gateway, same JSON 404 on every path.
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+- host: api-us.compactif.ai
+  note: US regional endpoint; same gateway, same JSON 404 on every path.
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+- host: docs.compactif.ai
+  note: Astro static site on S3/CloudFront; any unknown key returns an S3 <Error><Code>AccessDenied</Code>
+    XML body, i.e. an absence, not a served document.
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 403
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 403
+    file: null
+  - path: /.well-known/api-catalog
+    status: 403
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 403
+    file: null
+- host: multiversecomputing.com
+  note: Next.js marketing site; every /.well-known/ path renders the site 404 HTML
+    page.
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+notes:
+- No /.well-known document is served on any Multiverse Computing / CompactifAI host.
+  No WellKnown or SecurityTxt pointer is emitted in apis.yml — this file records a
+  measured absence, not a presence.
+- Vulnerability reports are accepted instead through the CompactifAI technical support
+  form by selecting the "Security" category (https://docs.compactif.ai/support-contact/),
+  and by email to support@compactif.ai.

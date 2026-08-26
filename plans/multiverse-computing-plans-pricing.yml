@@ -1,0 +1,91 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.compactif.ai/pricing/
+docs:
+- https://docs.compactif.ai/pricing/
+- https://multiversecomputing.com/compactifai/api
+- https://aws.amazon.com/marketplace/pp/prodview-ce2dp5ibd7lli
+currency: USD
+billing_model: usage-based
+plan_count: 2
+plans:
+- name: Pay-as-you-go
+  price: 0
+  currency: USD
+  period: month
+  price_model: metered
+  self_service: true
+  included_quota: none
+  overage: 'All usage billed per token (see model_pricing); billed monthly on actual
+    usage.'
+  limits:
+    minimum_spend: none
+    commitment: none
+    api_keys: 1 per account
+  promotion:
+    name: First month free for new sign-ups
+    terms: 'All models free your first month.'
+    source: https://multiversecomputing.com/compactifai/api
+  signup: https://auth.multiverseapp.ai/sign-up?redirect_url=https%3A%2F%2Fdashboard.compactif.ai%2F
+  note: 'Also purchasable through the AWS Marketplace listing (pay-as-you-go is the only
+    plan offered there); AWS subscription is manually approved, typically within 24 hours.'
+- name: Custom enterprise plan
+  price: null
+  currency: USD
+  period: null
+  price_model: contact-sales
+  self_service: false
+  included_quota: unpublished
+  overage: unpublished
+  limits: {}
+  contact: https://multiversecomputing.com/contact-us
+  note: 'Named on the pricing page ("to request a custom enterprise plan, please contact
+    our sales team") with no published price, quota or terms.'
+model_pricing:
+  unit: USD per 1M tokens
+  source: https://docs.compactif.ai/pricing/
+  text_models:
+  - model: cai-mistral-small-3-1-slim
+    input: 0.05
+    output: 0.08
+  - model: mistral-small-3-1
+    input: 0.11
+    output: 0.17
+  - model: nemotron-3-nano-omni
+    input: 0.20
+    output: 0.80
+  - model: gpt-oss-120b
+    input: 0.05
+    output: 0.23
+  - model: hypernova-60b
+    input: 0.04
+    output: 0.14
+  - model: carina-60b
+    input: 0.05
+    output: 0.20
+  - model: qwen-3-6-27b
+    input: 0.15
+    output: 0.90
+  - model: glm-5-1
+    input: 0.95
+    output: 3.15
+  - model: cai-glm-5-1
+    input: 1.00
+    output: 3.00
+  - model: glm-5-2
+    input: 1.10
+    output: 3.50
+  - model: quasar-438b
+    input: 0.60
+    output: 1.80
+  speech_to_text:
+  - model: cai-whisper-large-v3-turbo-slim
+    price_per_audio_minute: 0.000134
+    billing_granularity: Per-second billing with a 1-minute minimum
+    note: 'Published on the pricing page as "$0,000134" (comma decimal separator);
+      transcribed here as 0.000134 USD per audio minute.'
+notes:
+- A token is documented as approximately 4 characters or 0.75 words in English.
+- Billing is monthly on actual usage; there is no minimum spend and no monthly commitment.
+- Usage and billing visibility is in the CompactifAI Dashboard only — the
+  POST /v1/usage/completions endpoint was removed from the API on 2026-03-24.

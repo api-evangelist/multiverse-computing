@@ -1,0 +1,5002 @@
+openapi: 3.1.0
+info:
+  title: ChatbotAPI
+  description: Chatbot API. Provided by Multiverse Computing.
+  contact:
+    name: Multiverse Computing
+    url: https://multiversecomputing.com/
+    email: contact@multiversecomputing.com
+  version: 0.1.1
+paths:
+  /v1/audio/transcriptions:
+    post:
+      tags:
+      - audio
+      summary: Audio transcriptions endpoint (OpenAI compatible)
+      description: OpenAI-compatible POST `/v1/audio/transcriptions`.
+      operationId: create_transcription_v1_audio_transcriptions_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      - name: x-app-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-App-Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_transcription_v1_audio_transcriptions_post'
+      responses:
+        '200':
+          description: Transcription response in the requested format
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/batches:
+    post:
+      tags:
+      - batches
+      summary: Create a batch
+      description: 'Create a new batch inference job.
+
+
+        Accepts OpenAI ``BatchCreateParams`` (input file id, endpoint, completion_window).
+
+        Publishes the job to the file store for async processing and returns a Batch
+
+        object with status ``validating``.
+
+
+        Parameters:
+
+        - **app_config**: Application configuration.
+
+        - **batch_request**: Batch creation parameters (``input_file_id``, ``endpoint``,
+        ``completion_window``).
+
+        - **authorization**: Bearer token for authentication.
+
+
+        Returns:
+
+        - A Batch object with status ''validating''.'
+      operationId: create_batch_v1_batches_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchCreateParams'
+      responses:
+        '201':
+          description: The created batch object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - batches
+      summary: List batches
+      description: 'List batch jobs (OpenAI-compatible: ``GET /v1/batches`` with ``after``,
+        ``limit``, and list envelope).
+
+
+        Each entry is hydrated like ``GET /batches/{{batch_id}}`` (live status from
+        file meta).'
+      operationId: get_batches_v1_batches_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: after
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 'A cursor for pagination: the object id after which to fetch
+            the next page. Use the previous response''s last_id to page forward.'
+          title: After
+        description: 'A cursor for pagination: the object id after which to fetch
+          the next page. Use the previous response''s last_id to page forward.'
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Maximum number of items to return (1–100, default 20).
+          default: 20
+          title: Limit
+        description: Maximum number of items to return (1–100, default 20).
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: Paginated-style list of batch objects (OpenAI-compatible shape)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchList'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/batches/{batch_id}:
+    get:
+      tags:
+      - batches
+      summary: Retrieve a batch
+      description: 'Return the batch job state by loading the batch JSON stored at
+        creation time.
+
+
+        Parameters:
+
+        - **batch_id**: Identifier returned by ``POST /batches`` (e.g. ``batch_…``).
+
+        - **app_config**: Application configuration.
+
+        - **authorization**: Bearer token for authentication.
+
+
+        Returns:
+
+        - The persisted :class:`Batch` object (same shape as create), including ``status``.'
+      operationId: get_batch_v1_batches__batch_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Batch Id
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: The batch object including current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/batches/{batch_id}/cancel:
+    post:
+      tags:
+      - batches
+      summary: Cancel a batch
+      description: 'Request cancellation of an in-progress batch (OpenAI-compatible
+        shape).
+
+
+        Matches ``POST /v1/batches/{batch_id}/cancel``: returns the updated :class:`Batch`,
+
+        usually with ``status`` ``cancelling`` and ``cancelling_at`` set.
+
+
+        Parameters:
+
+        - **batch_id**: Batch identifier (e.g. ``batch_…``).
+
+        - **authorization**: Bearer token for authentication.
+
+
+        Returns:
+
+        - The updated batch object.'
+      operationId: cancel_batch_v1_batches__batch_id__cancel_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Batch Id
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: The batch object after requesting cancellation (typically status
+            cancelling)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/chat/completions:
+    post:
+      tags:
+      - completions
+      summary: Chat completions endpoint
+      description: 'Generate a chat completion from the model.
+
+
+        Accepts a ChatCompletionRequest containing the model, message history, and
+        optional generation parameters
+
+        like temperature, max_tokens, etc. Returns a ChatCompletionResponse in OpenAI-compatible
+        format.
+
+
+        Parameters:
+
+        - **app_config**: Application configuration
+
+        - **chat_completion_request**: The prompt and parameters for model inference.
+
+        - **authorization**: The authorization credentials.
+
+
+        Returns:
+
+        - A ChatCompletionResponse containing the assistant''s reply.'
+      operationId: chat_completions_v1_chat_completions_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      - name: x-app-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-App-Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+      responses:
+        '200':
+          description: Chat completions response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/files/{file_id}/content:
+    get:
+      tags:
+      - files
+      summary: Retrieve file content
+      description: Return the raw binary contents of the specified file.
+      operationId: get_file_content_v1_files__file_id__content_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: File Id
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: Raw binary content of the file
+          content:
+            application/json:
+              schema: {}
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/files:
+    post:
+      tags:
+      - files
+      summary: Upload file
+      description: 'The file upload API authenticates with the bearer token and uses
+        app-level
+
+        file store configuration.'
+      operationId: post_files_v1_files_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_post_files_v1_files_post'
+      responses:
+        '200':
+          description: File object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileObject'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/models/{model}:
+    get:
+      tags:
+      - Model info
+      summary: Get model information
+      operationId: get_model_info_v1_models__model__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: model
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Model
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/models:
+    get:
+      tags:
+      - Model info
+      summary: Get model list
+      operationId: get_model_info_list_v1_models_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - HTTPBearer: []
+  /v1/completions:
+    post:
+      tags:
+      - completions
+      summary: Completions endpoint
+      description: 'Generate a completion from the model.
+
+
+        Accepts a CompletionRequest containing the model, prompt, and optional generation
+        parameters
+
+        like temperature, max_tokens, etc. Returns a CompletionResponse in OpenAI-compatible
+        format.
+
+
+        Parameters:
+
+        - **app_config**: Application configuration
+
+        - **completion_request**: The prompt and parameters for model inference.
+
+        - **authorization**: The authorization credentials.
+
+
+        Returns:
+
+        - A CompletionResponse containing the assistant''s reply.'
+      operationId: complete_prompt_v1_completions_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      - name: x-app-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-App-Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompletionRequest'
+      responses:
+        '200':
+          description: Completions response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompletionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/responses/{response_id}:
+    get:
+      tags:
+      - responses
+      summary: Retrieve response
+      description: 'Return a previously stored response, scoped to the authenticated
+        user.
+
+
+        Only responses created with ``store: true`` are available, and only to the
+
+        user who created them.'
+      operationId: get_response_v1_responses__response_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: response_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Response Id
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: Stored response payload from /v1/responses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsesResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/responses:
+    post:
+      tags:
+      - responses
+      summary: Create response
+      description: 'Generate a response from the model.
+
+
+        Parameters:
+
+        - **app_config**: Application configuration
+
+        - **body**: ResponsesRequest payload with model and optional response parameters.
+
+        - **authorization**: The authorization credentials.
+
+
+        Returns:
+
+        - A ResponsesResult for non-streaming requests.
+
+        - A StreamingResponse when stream is true.'
+      operationId: post_responses_v1_responses_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      - name: x-app-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-App-Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsesRequest'
+      responses:
+        '200':
+          description: Response payload (non-streaming). When stream=true a text/event-stream
+            of response events is returned instead.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsesResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ActionClick:
+      properties:
+        button:
+          type: string
+          enum:
+          - left
+          - right
+          - wheel
+          - back
+          - forward
+          title: Button
+        type:
+          type: string
+          const: click
+          title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - button
+      - type
+      - x
+      - y
+      title: ActionClick
+    ActionDoubleClick:
+      properties:
+        type:
+          type: string
+          const: double_click
+          title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - x
+      - y
+      title: ActionDoubleClick
+    ActionDrag:
+      properties:
+        path:
+          items:
+            $ref: '#/components/schemas/ActionDragPath'
+          type: array
+          title: Path
+        type:
+          type: string
+          const: drag
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - path
+      - type
+      title: ActionDrag
+    ActionDragPath:
+      properties:
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - x
+      - y
+      title: ActionDragPath
+    ActionFind:
+      properties:
+        pattern:
+          type: string
+          title: Pattern
+        type:
+          type: string
+          const: find
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - pattern
+      - type
+      - url
+      title: ActionFind
+    ActionKeypress:
+      properties:
+        keys:
+          items:
+            type: string
+          type: array
+          title: Keys
+        type:
+          type: string
+          const: keypress
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - keys
+      - type
+      title: ActionKeypress
+    ActionMove:
+      properties:
+        type:
+          type: string
+          const: move
+          title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - x
+      - y
+      title: ActionMove
+    ActionOpenPage:
+      properties:
+        type:
+          type: string
+          const: open_page
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - url
+      title: ActionOpenPage
+    ActionScreenshot:
+      properties:
+        type:
+          type: string
+          const: screenshot
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ActionScreenshot
+    ActionScroll:
+      properties:
+        scroll_x:
+          type: integer
+          title: Scroll X
+        scroll_y:
+          type: integer
+          title: Scroll Y
+        type:
+          type: string
+          const: scroll
+          title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - scroll_x
+      - scroll_y
+      - type
+      - x
+      - y
+      title: ActionScroll
+    ActionSearch:
+      properties:
+        query:
+          type: string
+          title: Query
+        type:
+          type: string
+          const: search
+          title: Type
+        sources:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ActionSearchSource'
+            type: array
+          - type: 'null'
+          title: Sources
+      additionalProperties: true
+      type: object
+      required:
+      - query
+      - type
+      title: ActionSearch
+    ActionSearchSource:
+      properties:
+        type:
+          type: string
+          const: url
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - url
+      title: ActionSearchSource
+    ActionType:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: type
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: ActionType
+    ActionWait:
+      properties:
+        type:
+          type: string
+          const: wait
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ActionWait
+    AnnotationContainerFileCitation:
+      properties:
+        container_id:
+          type: string
+          title: Container Id
+        end_index:
+          type: integer
+          title: End Index
+        file_id:
+          type: string
+          title: File Id
+        filename:
+          type: string
+          title: Filename
+        start_index:
+          type: integer
+          title: Start Index
+        type:
+          type: string
+          const: container_file_citation
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - container_id
+      - end_index
+      - file_id
+      - filename
+      - start_index
+      - type
+      title: AnnotationContainerFileCitation
+    AnnotationFileCitation:
+      properties:
+        file_id:
+          type: string
+          title: File Id
+        filename:
+          type: string
+          title: Filename
+        index:
+          type: integer
+          title: Index
+        type:
+          type: string
+          const: file_citation
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - file_id
+      - filename
+      - index
+      - type
+      title: AnnotationFileCitation
+    AnnotationFilePath:
+      properties:
+        file_id:
+          type: string
+          title: File Id
+        index:
+          type: integer
+          title: Index
+        type:
+          type: string
+          const: file_path
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - file_id
+      - index
+      - type
+      title: AnnotationFilePath
+    AnnotationURLCitation:
+      properties:
+        end_index:
+          type: integer
+          title: End Index
+        start_index:
+          type: integer
+          title: Start Index
+        title:
+          type: string
+          title: Title
+        type:
+          type: string
+          const: url_citation
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - end_index
+      - start_index
+      - title
+      - type
+      - url
+      title: AnnotationURLCitation
+    Audio:
+      properties:
+        id:
+          type: string
+          title: Id
+      type: object
+      required:
+      - id
+      title: Audio
+    Batch:
+      properties:
+        id:
+          type: string
+          title: Id
+        completion_window:
+          type: string
+          title: Completion Window
+        created_at:
+          type: integer
+          title: Created At
+        endpoint:
+          type: string
+          title: Endpoint
+        input_file_id:
+          type: string
+          title: Input File Id
+        object:
+          type: string
+          const: batch
+          title: Object
+        status:
+          type: string
+          enum:
+          - validating
+          - failed
+          - in_progress
+          - finalizing
+          - completed
+          - expired
+          - cancelling
+          - cancelled
+          title: Status
+        cancelled_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cancelled At
+        cancelling_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cancelling At
+        completed_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Completed At
+        error_file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error File Id
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Errors'
+          - type: 'null'
+        expired_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expired At
+        expires_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expires At
+        failed_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Failed At
+        finalizing_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Finalizing At
+        in_progress_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: In Progress At
+        metadata:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Metadata
+        model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Model
+        output_file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Output File Id
+        request_counts:
+          anyOf:
+          - $ref: '#/components/schemas/BatchRequestCounts'
+          - type: 'null'
+        usage:
+          anyOf:
+          - $ref: '#/components/schemas/BatchUsage'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - completion_window
+      - created_at
+      - endpoint
+      - input_file_id
+      - object
+      - status
+      title: Batch
+    BatchCreateParams:
+      properties:
+        completion_window:
+          type: string
+          const: 24h
+          title: Completion Window
+        endpoint:
+          type: string
+          enum:
+          - /v1/responses
+          - /v1/chat/completions
+          - /v1/embeddings
+          - /v1/completions
+          title: Endpoint
+        input_file_id:
+          type: string
+          title: Input File Id
+        metadata:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Metadata
+        output_expires_after:
+          $ref: '#/components/schemas/OutputExpiresAfter'
+      type: object
+      required:
+      - completion_window
+      - endpoint
+      - input_file_id
+      title: BatchCreateParams
+    BatchError:
+      properties:
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        line:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Line
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        param:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Param
+      additionalProperties: true
+      type: object
+      title: BatchError
+    BatchList:
+      properties:
+        object:
+          type: string
+          const: list
+          title: Object
+          description: Object type; always 'list' for a paginated collection.
+          default: list
+        data:
+          items:
+            $ref: '#/components/schemas/Batch'
+          type: array
+          title: Data
+          description: The page of items, in id-cursor order.
+        has_more:
+          type: boolean
+          title: Has More
+          description: Whether more items exist after this page.
+        first_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Id
+          description: Id of the first item in data, or null when the page is empty.
+        last_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Id
+          description: Id of the last item in data, or null when the page is empty.
+            Pass this back as 'after' to fetch the next page.
+      type: object
+      required:
+      - data
+      - has_more
+      title: BatchList
+      description: 'List batches response — matches https://platform.openai.com/docs/api-reference/batch/list.
+
+
+        Uses the shared :class:`~api.src.api_models.pagination.CursorPage` envelope
+        so
+
+        the pagination shape stays consistent across list endpoints.'
+    BatchRequestCounts:
+      properties:
+        completed:
+          type: integer
+          title: Completed
+        failed:
+          type: integer
+          title: Failed
+        total:
+          type: integer
+          title: Total
+      additionalProperties: true
+      type: object
+      required:
+      - completed
+      - failed
+      - total
+      title: BatchRequestCounts
+    BatchUsage:
+      properties:
+        input_tokens:
+          type: integer
+          title: Input Tokens
+        input_tokens_details:
+          $ref: '#/components/schemas/InputTokensDetails'
+        output_tokens:
+          type: integer
+          title: Output Tokens
+        output_tokens_details:
+          $ref: '#/components/schemas/OutputTokensDetails'
+        total_tokens:
+          type: integer
+          title: Total Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - input_tokens
+      - input_tokens_details
+      - output_tokens
+      - output_tokens_details
+      - total_tokens
+      title: BatchUsage
+    Body_create_transcription_v1_audio_transcriptions_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+          description: 'Audio file to transcribe. Supported formats: flac, mp3, mp4,
+            mpeg, mpga, m4a, ogg, wav, webm. Note: mp4, webm, and m4a files are automatically
+            converted to mp3.'
+        model:
+          type: string
+          title: Model
+          description: Model identifier (e.g., whisper-1)
+        prompt:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prompt
+          description: Optional text to guide the transcription
+        response_format:
+          anyOf:
+          - type: string
+            enum:
+            - json
+            - text
+            - srt
+            - verbose_json
+            - vtt
+          - type: 'null'
+          title: Response Format
+          description: Response format for the transcription. All values are accepted
+            but will default to 'json'.
+          default: json
+        temperature:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Temperature
+          description: Sampling temperature between 0 and 1
+        language:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Language
+          description: Language code hint for the audio (ISO-639-1, e.g. 'en', 'es').
+            If not provided, the model will auto-detect the language.
+        stream:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stream
+          description: If true, streams server-sent events.
+        include:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Include
+          description: Additional transcription metadata to return (e.g., 'logprobs').
+            Currently ignored by this service.
+        timestamp_granularities:
+          anyOf:
+          - items:
+              type: string
+              enum:
+              - word
+              - segment
+            type: array
+          - type: 'null'
+          title: Timestamp Granularities
+          description: Timestamp granularity hints (word/segment). Ignored unless
+            verbose JSON is supported.
+        chunking_strategy:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Chunking Strategy
+          description: Controls how audio is chunked (e.g., 'auto' or server_vad object).
+            Ignored by this service.
+      type: object
+      required:
+      - file
+      - model
+      title: Body_create_transcription_v1_audio_transcriptions_post
+    Body_post_files_v1_files_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+          description: Binary file to upload.
+        purpose:
+          type: string
+          title: Purpose
+          description: Purpose of the file (e.g. assistants, batch, user_data).
+      type: object
+      required:
+      - file
+      - purpose
+      title: Body_post_files_v1_files_post
+    ChatCompletionAssistantMessageParam:
+      properties:
+        role:
+          type: string
+          const: assistant
+          title: Role
+        audio:
+          anyOf:
+          - $ref: '#/components/schemas/Audio'
+          - type: 'null'
+        content:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+              - $ref: '#/components/schemas/ChatCompletionContentPartRefusalParam'
+            type: array
+          - type: 'null'
+          title: Content
+        function_call:
+          anyOf:
+          - $ref: '#/components/schemas/FunctionCall'
+          - type: 'null'
+        name:
+          type: string
+          title: Name
+        refusal:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Refusal
+        tool_calls:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ChatCompletionMessageFunctionToolCallParam'
+            - $ref: '#/components/schemas/ChatCompletionMessageCustomToolCallParam'
+          type: array
+          title: Tool Calls
+      type: object
+      required:
+      - role
+      title: ChatCompletionAssistantMessageParam
+    ChatCompletionContentPartImageParam:
+      properties:
+        image_url:
+          $ref: '#/components/schemas/ImageURL'
+        type:
+          type: string
+          const: image_url
+          title: Type
+      type: object
+      required:
+      - image_url
+      - type
+      title: ChatCompletionContentPartImageParam
+    ChatCompletionContentPartInputAudioParam:
+      properties:
+        input_audio:
+          $ref: '#/components/schemas/InputAudio-Input'
+        type:
+          type: string
+          const: input_audio
+          title: Type
+      type: object
+      required:
+      - input_audio
+      - type
+      title: ChatCompletionContentPartInputAudioParam
+    ChatCompletionContentPartRefusalParam:
+      properties:
+        refusal:
+          type: string
+          title: Refusal
+        type:
+          type: string
+          const: refusal
+          title: Type
+      type: object
+      required:
+      - refusal
+      - type
+      title: ChatCompletionContentPartRefusalParam
+    ChatCompletionContentPartTextParam:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: text
+          title: Type
+      type: object
+      required:
+      - text
+      - type
+      title: ChatCompletionContentPartTextParam
+    ChatCompletionDeveloperMessageParam:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+            type: array
+          title: Content
+        role:
+          type: string
+          const: developer
+          title: Role
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - content
+      - role
+      title: ChatCompletionDeveloperMessageParam
+    ChatCompletionFunctionMessageParam:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+        name:
+          type: string
+          title: Name
+        role:
+          type: string
+          const: function
+          title: Role
+      type: object
+      required:
+      - content
+      - name
+      - role
+      title: ChatCompletionFunctionMessageParam
+    ChatCompletionMessageCustomToolCallParam:
+      properties:
+        id:
+          type: string
+          title: Id
+        custom:
+          $ref: '#/components/schemas/Custom'
+        type:
+          type: string
+          const: custom
+          title: Type
+      type: object
+      required:
+      - id
+      - custom
+      - type
+      title: ChatCompletionMessageCustomToolCallParam
+    ChatCompletionMessageFunctionToolCallParam:
+      properties:
+        id:
+          type: string
+          title: Id
+        function:
+          $ref: '#/components/schemas/Function'
+        type:
+          type: string
+          const: function
+          title: Type
+      type: object
+      required:
+      - id
+      - function
+      - type
+      title: ChatCompletionMessageFunctionToolCallParam
+    ChatCompletionRequest:
+      properties:
+        messages:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ChatCompletionDeveloperMessageParam'
+            - $ref: '#/components/schemas/ChatCompletionSystemMessageParam'
+            - $ref: '#/components/schemas/ChatCompletionUserMessageParam'
+            - $ref: '#/components/schemas/ChatCompletionAssistantMessageParam'
+            - $ref: '#/components/schemas/ChatCompletionToolMessageParam'
+            - $ref: '#/components/schemas/ChatCompletionFunctionMessageParam'
+          type: array
+          minItems: 1
+          title: Messages
+          description: The conversation messages history, in chronological order.
+        model:
+          type: string
+          title: Model
+          description: The name of the model to use.
+        frequency_penalty:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Frequency Penalty
+          description: Penalizes new tokens based on their frequency in the prompt.
+          default: 0.0
+        max_completion_tokens:
+          anyOf:
+          - type: integer
+            maximum: 150000.0
+            minimum: 1.0
+          - type: 'null'
+          title: Max Completion Tokens
+          description: Maximum number of tokens to generate in the response.
+        min_tokens:
+          anyOf:
+          - type: integer
+            maximum: 150000.0
+            minimum: 0.0
+          - type: 'null'
+          title: Min Tokens
+          description: Minimum number of tokens to generate in the response.
+        max_tokens:
+          anyOf:
+          - type: integer
+            maximum: 150000.0
+            minimum: 1.0
+          - type: 'null'
+          title: Max Tokens
+          description: Maximum number of tokens to generate in the response.Deprecated
+            in favor of max_completion_tokens.
+        n:
+          anyOf:
+          - type: integer
+            const: 1
+          - type: 'null'
+          title: N
+          description: How many completions to generate for each prompt. For the moment,
+            only 1 is supported.
+          default: 1
+        response_format:
+          anyOf:
+          - $ref: '#/components/schemas/ResponseFormat'
+          - type: 'null'
+          description: Specifies the output format for the model.
+        stop:
+          anyOf:
+          - type: string
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Stop
+          description: Sequences where the API will stop generating further tokens.
+        temperature:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: 0.0
+          - type: 'null'
+          title: Temperature
+          description: Sampling temperature to use. Higher values make output more
+            random.
+          default: 1.0
+        top_p:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Top P
+          description: Float in (0, 1] that controls the cumulative probability of
+            the top tokens to consider
+          default: 1.0
+        user:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User
+          description: Unique identifier for the end-user to help with monitoring
+            or abuse detection.
+        stream:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Stream
+          description: If true, return streamed responses as data-only server-sent
+            events.
+          default: false
+        tool_choice:
+          anyOf:
+          - type: string
+            enum:
+            - none
+            - auto
+            - required
+          - $ref: '#/components/schemas/ToolChoiceFunction-Input'
+          - type: 'null'
+          title: Tool Choice
+          description: Controls tool call behavior. One of 'none', 'auto', 'required',
+            or a specific tool function name.
+        tools:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Tool'
+            type: array
+          - type: 'null'
+          title: Tools
+          description: List of available tools
+        ignore_eos:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Ignore Eos
+          description: If true, the end of sentence tokens will be ignored. The model
+            will generate tokens until `max_tokens` is reached.
+          default: false
+        reasoning_effort:
+          anyOf:
+          - type: string
+            enum:
+            - none
+            - low
+            - medium
+            - high
+            - xhigh
+            - max
+          - type: 'null'
+          title: Reasoning Effort
+          description: "Constrains effort on reasoning for reasoning models. Accepted\
+            \ values\n        are `none`, `low`, `medium`, `high`, `xhigh` and `max`.\
+            \ Reducing reasoning\n        effort can result in faster responses and\
+            \ fewer tokens used on reasoning in a\n        response. Not every model\
+            \ implements every level: a model that does not support the\n        requested\
+            \ one rejects the request and names the levels it does support."
+        reasoning_enabled:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Reasoning Enabled
+          description: Whether reasoning is enabled for this request. Only applicable
+            for models that support reasoning control.
+      type: object
+      required:
+      - messages
+      - model
+      title: ChatCompletionRequest
+      description: 'The request body for the chat completion
+
+        Ordered by official OpenAI API documentation
+
+        https://platform.openai.com/docs/api-reference/chat/create'
+      examples:
+      - max_tokens: 128
+        messages:
+        - content: You are a helpful assistant.
+          role: system
+        - content: Hello, I'm Camillo
+          role: user
+        - content: What is my name? What is the capital of Colombia?
+          role: user
+        model: cai-llama-3-1-8b-slim
+        n: 1
+        stop:
+        - '###'
+        temperature: 0.7
+        tool_choice: auto
+        tools:
+        - function:
+            description: Get the current weather in a given location.
+            name: get_weather
+            parameters:
+              properties:
+                location:
+                  type: string
+                unit:
+                  enum:
+                  - celsius
+                  - fahrenheit
+                  type: string
+              required:
+              - location
+              type: object
+          type: function
+        user: user-123
+      - max_tokens: 128
+        messages:
+        - content:
+          - text: What do you see in this image? Describe it in detail.
+            type: text
+          - image_url:
+              url: https://cdn.britannica.com/86/170586-120-7E23E561/Taj-Mahal-Agra-India.jpg
+            type: image_url
+          role: user
+        model: mistral-small-3-1
+        n: 1
+        stop:
+        - '###'
+        temperature: 0.7
+        user: user-123
+    ChatCompletionSystemMessageParam:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+            type: array
+          title: Content
+        role:
+          type: string
+          const: system
+          title: Role
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - content
+      - role
+      title: ChatCompletionSystemMessageParam
+    ChatCompletionToolMessageParam:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+            type: array
+          title: Content
+        role:
+          type: string
+          const: tool
+          title: Role
+        tool_call_id:
+          type: string
+          title: Tool Call Id
+      type: object
+      required:
+      - content
+      - role
+      - tool_call_id
+      title: ChatCompletionToolMessageParam
+    ChatCompletionUserMessageParam:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+              - $ref: '#/components/schemas/ChatCompletionContentPartImageParam'
+              - $ref: '#/components/schemas/ChatCompletionContentPartInputAudioParam'
+              - $ref: '#/components/schemas/File'
+            type: array
+          title: Content
+        role:
+          type: string
+          const: user
+          title: Role
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - content
+      - role
+      title: ChatCompletionUserMessageParam
+    CodeInterpreter:
+      properties:
+        container:
+          anyOf:
+          - type: string
+          - $ref: '#/components/schemas/CodeInterpreterContainerCodeInterpreterToolAuto'
+          title: Container
+        type:
+          type: string
+          const: code_interpreter
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - container
+      - type
+      title: CodeInterpreter
+    CodeInterpreterContainerCodeInterpreterToolAuto:
+      properties:
+        type:
+          type: string
+          const: auto
+          title: Type
+        file_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: File Ids
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: CodeInterpreterContainerCodeInterpreterToolAuto
+    ComparisonFilter:
+      properties:
+        key:
+          type: string
+          title: Key
+        type:
+          type: string
+          enum:
+          - eq
+          - ne
+          - gt
+          - gte
+          - lt
+          - lte
+          title: Type
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          title: Value
+      additionalProperties: true
+      type: object
+      required:
+      - key
+      - type
+      - value
+      title: ComparisonFilter
+    CompletionChoice:
+      properties:
+        finish_reason:
+          type: string
+          enum:
+          - stop
+          - length
+          - content_filter
+          title: Finish Reason
+        index:
+          type: integer
+          title: Index
+        logprobs:
+          anyOf:
+          - $ref: '#/components/schemas/Logprobs'
+          - type: 'null'
+        text:
+          type: string
+          title: Text
+      additionalProperties: true
+      type: object
+      required:
+      - finish_reason
+      - index
+      - text
+      title: CompletionChoice
+    CompletionRequest:
+      properties:
+        model:
+          type: string
+          title: Model
+          description: The name of the model to use.
+        prompt:
+          anyOf:
+          - type: string
+          - items:
+              type: string
+            type: array
+          minLength: 1
+          title: Prompt
+          description: The prompt(s) to generate completions.
+        max_tokens:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Max Tokens
+          description: Maximum number of tokens to generate per output sequence.
+          default: 16
+        min_tokens:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Min Tokens
+          description: Minimum number of tokens to generate per output sequence.
+        stop:
+          anyOf:
+          - type: string
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Stop
+          description: list of strings that stop the generation when they are generated.
+        temperature:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: 0.0
+          - type: 'null'
+          title: Temperature
+          description: Float that controls the randomness of the sampling. Lower values
+            make the model more deterministic, while higher values make the model
+            more random. Zero means greedy sampling.
+          default: 1.0
+        top_p:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Top P
+          description: Float in (0, 1] that controls the cumulative probability of
+            the top tokens to consider
+          default: 1.0
+        user:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User
+          description: Unique identifier for the end-user to help with monitoring
+            or abuse detection.
+      type: object
+      required:
+      - model
+      - prompt
+      title: CompletionRequest
+      description: 'The request for completion. Follows schema defined in
+
+        https://platform.openai.com/docs/api-reference/completions/create'
+      examples:
+      - max_tokens: 128
+        model: cai-llama-3-1-8b-slim
+        prompt: What is the capital of France ?
+        stop:
+        - '###'
+        temperature: 0.7
+        top_p: 0.9
+        user: user-123
+    CompletionResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        choices:
+          items:
+            $ref: '#/components/schemas/CompletionChoice'
+          type: array
+          title: Choices
+        created:
+          type: integer
+          title: Created
+        model:
+          type: string
+          title: Model
+        object:
+          type: string
+          const: text_completion
+          title: Object
+        system_fingerprint:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: System Fingerprint
+        usage:
+          anyOf:
+          - $ref: '#/components/schemas/CompletionUsage'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - choices
+      - created
+      - model
+      - object
+      title: CompletionResponse
+      description: 'The response from the completion. Follows schema defined in
+
+        https://platform.openai.com/docs/api-reference/completions/object'
+      examples:
+      - choices:
+        - finish_reason: stop
+          index: 0
+          text: The capital of France is Paris.
+        created: 1740395337
+        id: 1861edc39ce648e3862a0b6ae9b7687b
+        model: cai-llama-3-1-8b-slim
+        object: text_completion
+        usage:
+          completion_tokens: 7
+          prompt_tokens: 5
+          total_tokens: 12
+    CompletionTokensDetails:
+      properties:
+        accepted_prediction_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Accepted Prediction Tokens
+        audio_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Audio Tokens
+        reasoning_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Reasoning Tokens
+        rejected_prediction_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Rejected Prediction Tokens
+      additionalProperties: true
+      type: object
+      title: CompletionTokensDetails
+    CompletionUsage:
+      properties:
+        completion_tokens:
+          type: integer
+          title: Completion Tokens
+        prompt_tokens:
+          type: integer
+          title: Prompt Tokens
+        total_tokens:
+          type: integer
+          title: Total Tokens
+        completion_tokens_details:
+          anyOf:
+          - $ref: '#/components/schemas/CompletionTokensDetails'
+          - type: 'null'
+        prompt_tokens_details:
+          anyOf:
+          - $ref: '#/components/schemas/PromptTokensDetails'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - completion_tokens
+      - prompt_tokens
+      - total_tokens
+      title: CompletionUsage
+    CompoundFilter:
+      properties:
+        filters:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ComparisonFilter'
+            - {}
+          type: array
+          title: Filters
+        type:
+          type: string
+          enum:
+          - and
+          - or
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - filters
+      - type
+      title: CompoundFilter
+    ComputerCallOutput:
+      properties:
+        call_id:
+          type: string
+          title: Call Id
+        output:
+          $ref: '#/components/schemas/ResponseComputerToolCallOutputScreenshot'
+        type:
+          type: string
+          const: computer_call_output
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        acknowledged_safety_checks:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ComputerCallOutputAcknowledgedSafetyCheck'
+            type: array
+          - type: 'null'
+          title: Acknowledged Safety Checks
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - call_id
+      - output
+      - type
+      title: ComputerCallOutput
+    ComputerCallOutputAcknowledgedSafetyCheck:
+      properties:
+        id:
+          type: string
+          title: Id
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: ComputerCallOutputAcknowledgedSafetyCheck
+    ComputerTool:
+      properties:
+        display_height:
+          type: integer
+          title: Display Height
+        display_width:
+          type: integer
+          title: Display Width
+        environment:
+          type: string
+          enum:
+          - windows
+          - mac
+          - linux
+          - ubuntu
+          - browser
+          title: Environment
+        type:
+          type: string
+          const: computer_use_preview
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - display_height
+      - display_width
+      - environment
+      - type
+      title: ComputerTool
+    Content:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: reasoning_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: Content
+    Conversation:
+      properties:
+        id:
+          type: string
+          title: Id
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: Conversation
+    Custom:
+      properties:
+        input:
+          type: string
+          title: Input
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - input
+      - name
+      title: Custom
+    CustomTool:
+      properties:
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          const: custom
+          title: Type
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        format:
+          anyOf:
+          - $ref: '#/components/schemas/Text'
+          - $ref: '#/components/schemas/Grammar'
+          - type: 'null'
+          title: Format
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - type
+      title: CustomTool
+    EasyInputMessage:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ResponseInputText'
+              - $ref: '#/components/schemas/ResponseInputImage'
+              - $ref: '#/components/schemas/ResponseInputFile'
+              - $ref: '#/components/schemas/ResponseInputAudio'
+            type: array
+          title: Content
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          - system
+          - developer
+          title: Role
+        type:
+          anyOf:
+          - type: string
+            const: message
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - content
+      - role
+      title: EasyInputMessage
+    Errors:
+      properties:
+        data:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/BatchError'
+            type: array
+          - type: 'null'
+          title: Data
+        object:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Object
+      additionalProperties: true
+      type: object
+      title: Errors
+    File:
+      properties:
+        file:
+          $ref: '#/components/schemas/FileFile'
+        type:
+          type: string
+          const: file
+          title: Type
+      type: object
+      required:
+      - file
+      - type
+      title: File
+    FileFile:
+      properties:
+        file_data:
+          type: string
+          title: File Data
+        file_id:
+          type: string
+          title: File Id
+        filename:
+          type: string
+          title: Filename
+      type: object
+      title: FileFile
+    FileObject:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: File identifier to use with /v1/responses.
+        object:
+          type: string
+          const: file
+          title: Object
+          description: Object type discriminator.
+          default: file
+        bytes:
+          type: integer
+          title: Bytes
+          description: Size of the file in bytes.
+        created_at:
+          type: integer
+          title: Created At
+          description: Unix timestamp when the file was created.
+        filename:
+          type: string
+          title: Filename
+          description: Original filename.
+        purpose:
+          type: string
+          title: Purpose
+          description: Purpose of the file (e.g. user_data, assistants).
+        owner_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Owner Id
+          description: Application user id that owns this file.
+        s3_uri:
+          anyOf:
+          - $ref: '#/components/schemas/S3Uri'
+          - additionalProperties: true
+            type: object
+          - type: string
+          - type: 'null'
+          title: S3 Uri
+          description: S3 location metadata (bucket, key, region, s3_uri).
+        status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+          description: 'Lifecycle status: pending, uploading, uploaded, error.'
+        ttl:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Ttl
+          description: Unix timestamp for automatic expiration, if set.
+        updated_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Updated At
+          description: Unix timestamp of the last metadata update.
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - bytes
+      - created_at
+      - filename
+      - purpose
+      title: FileObject
+      description: Metadata to an uploaded file (JSON ``file`` object shape).
+    FileSearchTool:
+      properties:
+        type:
+          type: string
+          const: file_search
+          title: Type
+        vector_store_ids:
+          items:
+            type: string
+          type: array
+          title: Vector Store Ids
+        filters:
+          anyOf:
+          - $ref: '#/components/schemas/ComparisonFilter'
+          - $ref: '#/components/schemas/CompoundFilter'
+          - type: 'null'
+          title: Filters
+        max_num_results:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Num Results
+        ranking_options:
+          anyOf:
+          - $ref: '#/components/schemas/RankingOptions'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - vector_store_ids
+      title: FileSearchTool
+    Filters:
+      properties:
+        allowed_domains:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Allowed Domains
+      additionalProperties: true
+      type: object
+      title: Filters
+    Function:
+      properties:
+        arguments:
+          type: string
+          title: Arguments
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - arguments
+      - name
+      title: Function
+    FunctionCall:
+      properties:
+        arguments:
+          type: string
+          title: Arguments
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - arguments
+      - name
+      title: FunctionCall
+    FunctionCallOutput:
+      properties:
+        call_id:
+          type: string
+          title: Call Id
+        output:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ResponseInputTextContent'
+              - $ref: '#/components/schemas/ResponseInputImageContent'
+              - $ref: '#/components/schemas/ResponseInputFileContent'
+            type: array
+          title: Output
+        type:
+          type: string
+          const: function_call_output
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - call_id
+      - output
+      - type
+      title: FunctionCallOutput
+    FunctionTool-Input:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        parameters:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Parameters
+      type: object
+      required:
+      - name
+      title: FunctionTool
+    FunctionTool-Output:
+      properties:
+        name:
+          type: string
+          title: Name
+        parameters:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Parameters
+        strict:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Strict
+        type:
+          type: string
+          const: function
+          title: Type
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - type
+      title: FunctionTool
+    Grammar:
+      properties:
+        definition:
+          type: string
+          title: Definition
+        syntax:
+          type: string
+          enum:
+          - lark
+          - regex
+          title: Syntax
+        type:
+          type: string
+          const: grammar
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - definition
+      - syntax
+      - type
+      title: Grammar
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ImageGeneration:
+      properties:
+        type:
+          type: string
+          const: image_generation
+          title: Type
+        background:
+          anyOf:
+          - type: string
+            enum:
+            - transparent
+            - opaque
+            - auto
+          - type: 'null'
+          title: Background
+        input_fidelity:
+          anyOf:
+          - type: string
+            enum:
+            - high
+            - low
+          - type: 'null'
+          title: Input Fidelity
+        input_image_mask:
+          anyOf:
+          - $ref: '#/components/schemas/ImageGenerationInputImageMask'
+          - type: 'null'
+        model:
+          anyOf:
+          - type: string
+            const: gpt-image-1
+          - type: 'null'
+          title: Model
+        moderation:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - low
+          - type: 'null'
+          title: Moderation
+        output_compression:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Output Compression
+        output_format:
+          anyOf:
+          - type: string
+            enum:
+            - png
+            - webp
+            - jpeg
+          - type: 'null'
+          title: Output Format
+        partial_images:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Partial Images
+        quality:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - medium
+            - high
+            - auto
+          - type: 'null'
+          title: Quality
+        size:
+          anyOf:
+          - type: string
+            enum:
+            - 1024x1024
+            - 1024x1536
+            - 1536x1024
+            - auto
+          - type: 'null'
+          title: Size
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ImageGeneration
+    ImageGenerationCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        result:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Result
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - generating
+          - failed
+          title: Status
+        type:
+          type: string
+          const: image_generation_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - status
+      - type
+      title: ImageGenerationCall
+    ImageGenerationInputImageMask:
+      properties:
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        image_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Url
+      additionalProperties: true
+      type: object
+      title: ImageGenerationInputImageMask
+    ImageURL:
+      properties:
+        url:
+          type: string
+          title: Url
+        detail:
+          type: string
+          enum:
+          - auto
+          - low
+          - high
+          title: Detail
+      type: object
+      required:
+      - url
+      title: ImageURL
+    IncompleteDetails:
+      properties:
+        reason:
+          anyOf:
+          - type: string
+            enum:
+            - max_output_tokens
+            - content_filter
+          - type: 'null'
+          title: Reason
+      additionalProperties: true
+      type: object
+      title: IncompleteDetails
+    InputAudio-Input:
+      properties:
+        data:
+          type: string
+          title: Data
+        format:
+          type: string
+          enum:
+          - wav
+          - mp3
+          title: Format
+      type: object
+      required:
+      - data
+      - format
+      title: InputAudio
+    InputAudio-Output:
+      properties:
+        data:
+          type: string
+          title: Data
+        format:
+          type: string
+          enum:
+          - mp3
+          - wav
+          title: Format
+      additionalProperties: true
+      type: object
+      required:
+      - data
+      - format
+      title: InputAudio
+    InputTokensDetails:
+      properties:
+        cached_tokens:
+          type: integer
+          title: Cached Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - cached_tokens
+      title: InputTokensDetails
+    ItemReference:
+      properties:
+        id:
+          type: string
+          title: Id
+        type:
+          anyOf:
+          - type: string
+            const: item_reference
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: ItemReference
+    JsonSchemaResponseFormat:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        schema:
+          additionalProperties: true
+          type: object
+          title: Schema
+        strict:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Strict
+      type: object
+      required:
+      - name
+      - schema
+      title: JsonSchemaResponseFormat
+    LocalShell:
+      properties:
+        type:
+          type: string
+          const: local_shell
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: LocalShell
+    LocalShellCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        action:
+          $ref: '#/components/schemas/LocalShellCallAction'
+        call_id:
+          type: string
+          title: Call Id
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - incomplete
+          title: Status
+        type:
+          type: string
+          const: local_shell_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - action
+      - call_id
+      - status
+      - type
+      title: LocalShellCall
+    LocalShellCallAction:
+      properties:
+        command:
+          items:
+            type: string
+          type: array
+          title: Command
+        env:
+          additionalProperties:
+            type: string
+          type: object
+          title: Env
+        type:
+          type: string
+          const: exec
+          title: Type
+        timeout_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Timeout Ms
+        user:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User
+        working_directory:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Working Directory
+      additionalProperties: true
+      type: object
+      required:
+      - command
+      - env
+      - type
+      title: LocalShellCallAction
+    LocalShellCallOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+        output:
+          type: string
+          title: Output
+        type:
+          type: string
+          const: local_shell_call_output
+          title: Type
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - output
+      - type
+      title: LocalShellCallOutput
+    Logprob:
+      properties:
+        token:
+          type: string
+          title: Token
+        bytes:
+          items:
+            type: integer
+          type: array
+          title: Bytes
+        logprob:
+          type: number
+          title: Logprob
+        top_logprobs:
+          items:
+            $ref: '#/components/schemas/LogprobTopLogprob'
+          type: array
+          title: Top Logprobs
+      additionalProperties: true
+      type: object
+      required:
+      - token
+      - bytes
+      - logprob
+      - top_logprobs
+      title: Logprob
+    LogprobTopLogprob:
+      properties:
+        token:
+          type: string
+          title: Token
+        bytes:
+          items:
+            type: integer
+          type: array
+          title: Bytes
+        logprob:
+          type: number
+          title: Logprob
+      additionalProperties: true
+      type: object
+      required:
+      - token
+      - bytes
+      - logprob
+      title: LogprobTopLogprob
+    Logprobs:
+      properties:
+        text_offset:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Text Offset
+        token_logprobs:
+          anyOf:
+          - items:
+              type: number
+            type: array
+          - type: 'null'
+          title: Token Logprobs
+        tokens:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tokens
+        top_logprobs:
+          anyOf:
+          - items:
+              additionalProperties:
+                type: number
+              type: object
+            type: array
+          - type: 'null'
+          title: Top Logprobs
+      additionalProperties: true
+      type: object
+      title: Logprobs
+    Mcp:
+      properties:
+        server_label:
+          type: string
+          title: Server Label
+        type:
+          type: string
+          const: mcp
+          title: Type
+        allowed_tools:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - $ref: '#/components/schemas/McpAllowedToolsMcpToolFilter'
+          - type: 'null'
+          title: Allowed Tools
+        authorization:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+        connector_id:
+          anyOf:
+          - type: string
+            enum:
+            - connector_dropbox
+            - connector_gmail
+            - connector_googlecalendar
+            - connector_googledrive
+            - connector_microsoftteams
+            - connector_outlookcalendar
+            - connector_outlookemail
+            - connector_sharepoint
+          - type: 'null'
+          title: Connector Id
+        headers:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Headers
+        require_approval:
+          anyOf:
+          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilter'
+          - type: string
+            enum:
+            - always
+            - never
+          - type: 'null'
+          title: Require Approval
+        server_description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Server Description
+        server_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Server Url
+      additionalProperties: true
+      type: object
+      required:
+      - server_label
+      - type
+      title: Mcp
+    McpAllowedToolsMcpToolFilter:
+      properties:
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+        tool_names:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tool Names
+      additionalProperties: true
+      type: object
+      title: McpAllowedToolsMcpToolFilter
+    McpApprovalRequest:
+      properties:
+        id:
+          type: string
+          title: Id
+        arguments:
+          type: string
+          title: Arguments
+        name:
+          type: string
+          title: Name
+        server_label:
+          type: string
+          title: Server Label
+        type:
+          type: string
+          const: mcp_approval_request
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - arguments
+      - name
+      - server_label
+      - type
+      title: McpApprovalRequest
+    McpApprovalResponse:
+      properties:
+        approval_request_id:
+          type: string
+          title: Approval Request Id
+        approve:
+          type: boolean
+          title: Approve
+        type:
+          type: string
+          const: mcp_approval_response
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      additionalProperties: true
+      type: object
+      required:
+      - approval_request_id
+      - approve
+      - type
+      title: McpApprovalResponse
+    McpCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        arguments:
+          type: string
+          title: Arguments
+        name:
+          type: string
+          title: Name
+        server_label:
+          type: string
+          title: Server Label
+        type:
+          type: string
+          const: mcp_call
+          title: Type
+        approval_request_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Approval Request Id
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+        output:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Output
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+            - calling
+            - failed
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - arguments
+      - name
+      - server_label
+      - type
+      title: McpCall
+    McpListTools:
+      properties:
+        id:
+          type: string
+          title: Id
+        server_label:
+          type: string
+          title: Server Label
+        tools:
+          items:
+            $ref: '#/components/schemas/McpListToolsTool'
+          type: array
+          title: Tools
+        type:
+          type: string
+          const: mcp_list_tools
+          title: Type
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - server_label
+      - tools
+      - type
+      title: McpListTools
+    McpListToolsTool:
+      properties:
+        input_schema:
+          title: Input Schema
+        name:
+          type: string
+          title: Name
+        annotations:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Annotations
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      additionalProperties: true
+      type: object
+      required:
+      - input_schema
+      - name
+      title: McpListToolsTool
+    McpRequireApprovalMcpToolApprovalFilter:
+      properties:
+        always:
+          anyOf:
+          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilterAlways'
+          - type: 'null'
+        never:
+          anyOf:
+          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilterNever'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      title: McpRequireApprovalMcpToolApprovalFilter
+    McpRequireApprovalMcpToolApprovalFilterAlways:
+      properties:
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+        tool_names:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tool Names
+      additionalProperties: true
+      type: object
+      title: McpRequireApprovalMcpToolApprovalFilterAlways
+    McpRequireApprovalMcpToolApprovalFilterNever:
+      properties:
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+        tool_names:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tool Names
+      additionalProperties: true
+      type: object
+      title: McpRequireApprovalMcpToolApprovalFilterNever
+    Message:
+      properties:
+        content:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ResponseInputText'
+            - $ref: '#/components/schemas/ResponseInputImage'
+            - $ref: '#/components/schemas/ResponseInputFile'
+            - $ref: '#/components/schemas/ResponseInputAudio'
+          type: array
+          title: Content
+        role:
+          type: string
+          enum:
+          - user
+          - system
+          - developer
+          title: Role
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+        type:
+          anyOf:
+          - type: string
+            const: message
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - content
+      - role
+      title: Message
+    OutputExpiresAfter:
+      properties:
+        anchor:
+          type: string
+          const: created_at
+          title: Anchor
+        seconds:
+          type: integer
+          title: Seconds
+      type: object
+      required:
+      - anchor
+      - seconds
+      title: OutputExpiresAfter
+    OutputImage:
+      properties:
+        type:
+          type: string
+          const: image
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - url
+      title: OutputImage
+    OutputLogs:
+      properties:
+        logs:
+          type: string
+          title: Logs
+        type:
+          type: string
+          const: logs
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - logs
+      - type
+      title: OutputLogs
+    OutputTokensDetails:
+      properties:
+        reasoning_tokens:
+          type: integer
+          title: Reasoning Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - reasoning_tokens
+      title: OutputTokensDetails
+    PendingSafetyCheck:
+      properties:
+        id:
+          type: string
+          title: Id
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - code
+      - message
+      title: PendingSafetyCheck
+    PromptTokensDetails:
+      properties:
+        audio_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Audio Tokens
+        cached_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cached Tokens
+      additionalProperties: true
+      type: object
+      title: PromptTokensDetails
+    RankingOptions:
+      properties:
+        ranker:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - default-2024-11-15
+          - type: 'null'
+          title: Ranker
+        score_threshold:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Score Threshold
+      additionalProperties: true
+      type: object
+      title: RankingOptions
+    Reasoning:
+      properties:
+        effort:
+          anyOf:
+          - type: string
+            enum:
+            - minimal
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Effort
+        generate_summary:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - concise
+            - detailed
+          - type: 'null'
+          title: Generate Summary
+        summary:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - concise
+            - detailed
+          - type: 'null'
+          title: Summary
+      additionalProperties: true
+      type: object
+      title: Reasoning
+    ResponseCodeInterpreterToolCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        container_id:
+          type: string
+          title: Container Id
+        outputs:
+          anyOf:
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/OutputLogs'
+              - $ref: '#/components/schemas/OutputImage'
+            type: array
+          - type: 'null'
+          title: Outputs
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - incomplete
+          - interpreting
+          - failed
+          title: Status
+        type:
+          type: string
+          const: code_interpreter_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - container_id
+      - status
+      - type
+      title: ResponseCodeInterpreterToolCall
+    ResponseComputerToolCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        action:
+          anyOf:
+          - $ref: '#/components/schemas/ActionClick'
+          - $ref: '#/components/schemas/ActionDoubleClick'
+          - $ref: '#/components/schemas/ActionDrag'
+          - $ref: '#/components/schemas/ActionKeypress'
+          - $ref: '#/components/schemas/ActionMove'
+          - $ref: '#/components/schemas/ActionScreenshot'
+          - $ref: '#/components/schemas/ActionScroll'
+          - $ref: '#/components/schemas/ActionType'
+          - $ref: '#/components/schemas/ActionWait'
+          title: Action
+        call_id:
+          type: string
+          title: Call Id
+        pending_safety_checks:
+          items:
+            $ref: '#/components/schemas/PendingSafetyCheck'
+          type: array
+          title: Pending Safety Checks
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - incomplete
+          title: Status
+        type:
+          type: string
+          const: computer_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - action
+      - call_id
+      - pending_safety_checks
+      - status
+      - type
+      title: ResponseComputerToolCall
+    ResponseComputerToolCallOutputScreenshot:
+      properties:
+        type:
+          type: string
+          const: computer_screenshot
+          title: Type
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        image_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseComputerToolCallOutputScreenshot
+    ResponseCustomToolCall:
+      properties:
+        call_id:
+          type: string
+          title: Call Id
+        input:
+          type: string
+          title: Input
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          const: custom_tool_call
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+      additionalProperties: true
+      type: object
+      required:
+      - call_id
+      - input
+      - name
+      - type
+      title: ResponseCustomToolCall
+    ResponseCustomToolCallOutput:
+      properties:
+        call_id:
+          type: string
+          title: Call Id
+        output:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ResponseInputText'
+              - $ref: '#/components/schemas/ResponseInputImage'
+              - $ref: '#/components/schemas/ResponseInputFile'
+            type: array
+          title: Output
+        type:
+          type: string
+          const: custom_tool_call_output
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+      additionalProperties: true
+      type: object
+      required:
+      - call_id
+      - output
+      - type
+      title: ResponseCustomToolCallOutput
+    ResponseError:
+      properties:
+        code:
+          type: string
+          enum:
+          - server_error
+          - rate_limit_exceeded
+          - invalid_prompt
+          - vector_store_timeout
+          - invalid_image
+          - invalid_image_format
+          - invalid_base64_image
+          - invalid_image_url
+          - image_too_large
+          - image_too_small
+          - image_parse_error
+          - image_content_policy_violation
+          - invalid_image_mode
+          - image_file_too_large
+          - unsupported_image_media_type
+          - empty_image_file
+          - failed_to_download_image
+          - image_file_not_found
+          title: Code
+        message:
+          type: string
+          title: Message
+      additionalProperties: true
+      type: object
+      required:
+      - code
+      - message
+      title: ResponseError
+    ResponseFileSearchToolCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        queries:
+          items:
+            type: string
+          type: array
+          title: Queries
+        status:
+          type: string
+          enum:
+          - in_progress
+          - searching
+          - completed
+          - incomplete
+          - failed
+          title: Status
+        type:
+          type: string
+          const: file_search_call
+          title: Type
+        results:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Result'
+            type: array
+          - type: 'null'
+          title: Results
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - queries
+      - status
+      - type
+      title: ResponseFileSearchToolCall
+    ResponseFormat:
+      properties:
+        type:
+          type: string
+          enum:
+          - text
+          - json_schema
+          - json_object
+          title: Type
+        json_schema:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemaResponseFormat'
+          - type: 'null'
+      type: object
+      required:
+      - type
+      title: ResponseFormat
+    ResponseFormatJSONObject:
+      properties:
+        type:
+          type: string
+          const: json_object
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseFormatJSONObject
+    ResponseFormatText:
+      properties:
+        type:
+          type: string
+          const: text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseFormatText
+    ResponseFormatTextJSONSchemaConfig:
+      properties:
+        name:
+          type: string
+          title: Name
+        schema:
+          additionalProperties: true
+          type: object
+          title: Schema
+        type:
+          type: string
+          const: json_schema
+          title: Type
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        strict:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Strict
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - schema
+      - type
+      title: ResponseFormatTextJSONSchemaConfig
+    ResponseFunctionToolCall:
+      properties:
+        arguments:
+          type: string
+          title: Arguments
+        call_id:
+          type: string
+          title: Call Id
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          const: function_call
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - arguments
+      - call_id
+      - name
+      - type
+      title: ResponseFunctionToolCall
+    ResponseFunctionWebSearch:
+      properties:
+        id:
+          type: string
+          title: Id
+        action:
+          anyOf:
+          - $ref: '#/components/schemas/ActionSearch'
+          - $ref: '#/components/schemas/ActionOpenPage'
+          - $ref: '#/components/schemas/ActionFind'
+          title: Action
+        status:
+          type: string
+          enum:
+          - in_progress
+          - searching
+          - completed
+          - failed
+          title: Status
+        type:
+          type: string
+          const: web_search_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - action
+      - status
+      - type
+      title: ResponseFunctionWebSearch
+    ResponseInputAudio:
+      properties:
+        input_audio:
+          $ref: '#/components/schemas/InputAudio-Output'
+        type:
+          type: string
+          const: input_audio
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - input_audio
+      - type
+      title: ResponseInputAudio
+    ResponseInputFile:
+      properties:
+        type:
+          type: string
+          const: input_file
+          title: Type
+        file_data:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Data
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        file_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Url
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseInputFile
+    ResponseInputFileContent:
+      properties:
+        type:
+          type: string
+          const: input_file
+          title: Type
+        file_data:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Data
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        file_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Url
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseInputFileContent
+    ResponseInputImage:
+      properties:
+        detail:
+          type: string
+          enum:
+          - low
+          - high
+          - auto
+          title: Detail
+        type:
+          type: string
+          const: input_image
+          title: Type
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        image_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Url
+      additionalProperties: true
+      type: object
+      required:
+      - detail
+      - type
+      title: ResponseInputImage
+    ResponseInputImageContent:
+      properties:
+        type:
+          type: string
+          const: input_image
+          title: Type
+        detail:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - high
+            - auto
+          - type: 'null'
+          title: Detail
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        image_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseInputImageContent
+    ResponseInputText:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: input_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: ResponseInputText
+    ResponseInputTextContent:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: input_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: ResponseInputTextContent
+    ResponseOutputMessage:
+      properties:
+        id:
+          type: string
+          title: Id
+        content:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ResponseOutputText'
+            - $ref: '#/components/schemas/ResponseOutputRefusal'
+          type: array
+          title: Content
+        role:
+          type: string
+          const: assistant
+          title: Role
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - incomplete
+          title: Status
+        type:
+          type: string
+          const: message
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - content
+      - role
+      - status
+      - type
+      title: ResponseOutputMessage
+    ResponseOutputRefusal:
+      properties:
+        refusal:
+          type: string
+          title: Refusal
+        type:
+          type: string
+          const: refusal
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - refusal
+      - type
+      title: ResponseOutputRefusal
+    ResponseOutputText:
+      properties:
+        annotations:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/AnnotationFileCitation'
+            - $ref: '#/components/schemas/AnnotationURLCitation'
+            - $ref: '#/components/schemas/AnnotationContainerFileCitation'
+            - $ref: '#/components/schemas/AnnotationFilePath'
+          type: array
+          title: Annotations
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: output_text
+          title: Type
+        logprobs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Logprob'
+            type: array
+          - type: 'null'
+          title: Logprobs
+      additionalProperties: true
+      type: object
+      required:
+      - annotations
+      - text
+      - type
+      title: ResponseOutputText
+    ResponsePrompt:
+      properties:
+        id:
+          type: string
+          title: Id
+        variables:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/ResponseInputText'
+              - $ref: '#/components/schemas/ResponseInputImage'
+              - $ref: '#/components/schemas/ResponseInputFile'
+            type: object
+          - type: 'null'
+          title: Variables
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: ResponsePrompt
+    ResponseReasoningItem:
+      properties:
+        id:
+          type: string
+          title: Id
+        summary:
+          items:
+            $ref: '#/components/schemas/Summary'
+          type: array
+          title: Summary
+        type:
+          type: string
+          const: reasoning
+          title: Type
+        content:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Content'
+            type: array
+          - type: 'null'
+          title: Content
+        encrypted_content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Encrypted Content
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - summary
+      - type
+      title: ResponseReasoningItem
+    ResponseTextConfig:
+      properties:
+        format:
+          anyOf:
+          - $ref: '#/components/schemas/ResponseFormatText'
+          - $ref: '#/components/schemas/ResponseFormatTextJSONSchemaConfig'
+          - $ref: '#/components/schemas/ResponseFormatJSONObject'
+          - type: 'null'
+          title: Format
+        verbosity:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Verbosity
+      additionalProperties: true
+      type: object
+      title: ResponseTextConfig
+    ResponseUsage:
+      properties:
+        input_tokens:
+          type: integer
+          title: Input Tokens
+        input_tokens_details:
+          $ref: '#/components/schemas/InputTokensDetails'
+        output_tokens:
+          type: integer
+          title: Output Tokens
+        output_tokens_details:
+          $ref: '#/components/schemas/OutputTokensDetails'
+        total_tokens:
+          type: integer
+          title: Total Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - input_tokens
+      - input_tokens_details
+      - output_tokens
+      - output_tokens_details
+      - total_tokens
+      title: ResponseUsage
+    ResponsesRequest:
+      properties:
+        model:
+          type: string
+          minLength: 1
+          title: Model
+          description: The name of the model to use (key in model configurations).
+        input:
+          title: Input
+          description: Required. Input to the responses endpoint. This is forwarded
+            to the backend and may be a string or a structured content array, depending
+            on model support.
+        store:
+          type: boolean
+          title: Store
+          description: Whether to store the response.
+          default: false
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+          description: Optional. Id returned by POST /v1/files (data layer). The gateway
+            fetches the file metadata/content from the data layer and forwards a file
+            object to vLLM.
+        temperature:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: 0.0
+          - type: 'null'
+          title: Temperature
+          description: Sampling temperature (0–2, same range as chat completions).
+        max_output_tokens:
+          anyOf:
+          - type: integer
+            maximum: 150000.0
+            minimum: 1.0
+          - type: 'null'
+          title: Max Output Tokens
+          description: Upper bound on output tokens (same bounds as chat max_completion_tokens).
+      additionalProperties: true
+      type: object
+      required:
+      - model
+      - input
+      title: ResponsesRequest
+      description: 'Request body for the responses endpoint (/v1/responses).
+
+
+        Required: model, input. Optional: store, temperature, max_output_tokens. Additional
+
+        fields (e.g. text, reasoning, metadata, tools) are forwarded to the backend.'
+      examples:
+      - input: Say hello in one short sentence.
+        model: cai-llama-3-1-8b-slim
+        reasoning: {}
+        store: false
+        text:
+          format:
+            type: text
+    ResponsesResult:
+      properties:
+        id:
+          type: string
+          title: Id
+        created_at:
+          type: integer
+          title: Created At
+          description: Unix timestamp (seconds) when the response was created.
+        error:
+          anyOf:
+          - $ref: '#/components/schemas/ResponseError'
+          - type: 'null'
+        incomplete_details:
+          anyOf:
+          - $ref: '#/components/schemas/IncompleteDetails'
+          - type: 'null'
+        instructions:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/EasyInputMessage'
+              - $ref: '#/components/schemas/Message'
+              - $ref: '#/components/schemas/ResponseOutputMessage'
+              - $ref: '#/components/schemas/ResponseFileSearchToolCall'
+              - $ref: '#/components/schemas/ResponseComputerToolCall'
+              - $ref: '#/components/schemas/ComputerCallOutput'
+              - $ref: '#/components/schemas/ResponseFunctionWebSearch'
+              - $ref: '#/components/schemas/ResponseFunctionToolCall'
+              - $ref: '#/components/schemas/FunctionCallOutput'
+              - $ref: '#/components/schemas/ResponseReasoningItem'
+              - $ref: '#/components/schemas/ImageGenerationCall'
+              - $ref: '#/components/schemas/ResponseCodeInterpreterToolCall'
+              - $ref: '#/components/schemas/LocalShellCall'
+              - $ref: '#/components/schemas/LocalShellCallOutput'
+              - $ref: '#/components/schemas/McpListTools'
+              - $ref: '#/components/schemas/McpApprovalRequest'
+              - $ref: '#/components/schemas/McpApprovalResponse'
+              - $ref: '#/components/schemas/McpCall'
+              - $ref: '#/components/schemas/ResponseCustomToolCallOutput'
+              - $ref: '#/components/schemas/ResponseCustomToolCall'
+              - $ref: '#/components/schemas/ItemReference'
+            type: array
+          - type: 'null'
+          title: Instructions
+        metadata:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Metadata
+        model:
+          anyOf:
+          - type: string
+          - type: string
+            enum:
+            - gpt-5
+            - gpt-5-mini
+            - gpt-5-nano
+            - gpt-5-2025-08-07
+            - gpt-5-mini-2025-08-07
+            - gpt-5-nano-2025-08-07
+            - gpt-5-chat-latest
+            - gpt-4.1
+            - gpt-4.1-mini
+            - gpt-4.1-nano
+            - gpt-4.1-2025-04-14
+            - gpt-4.1-mini-2025-04-14
+            - gpt-4.1-nano-2025-04-14
+            - o4-mini
+            - o4-mini-2025-04-16
+            - o3
+            - o3-2025-04-16
+            - o3-mini
+            - o3-mini-2025-01-31
+            - o1
+            - o1-2024-12-17
+            - o1-preview
+            - o1-preview-2024-09-12
+            - o1-mini
+            - o1-mini-2024-09-12
+            - gpt-4o
+            - gpt-4o-2024-11-20
+            - gpt-4o-2024-08-06
+            - gpt-4o-2024-05-13
+            - gpt-4o-audio-preview
+            - gpt-4o-audio-preview-2024-10-01
+            - gpt-4o-audio-preview-2024-12-17
+            - gpt-4o-audio-preview-2025-06-03
+            - gpt-4o-mini-audio-preview
+            - gpt-4o-mini-audio-preview-2024-12-17
+            - gpt-4o-search-preview
+            - gpt-4o-mini-search-preview
+            - gpt-4o-search-preview-2025-03-11
+            - gpt-4o-mini-search-preview-2025-03-11
+            - chatgpt-4o-latest
+            - codex-mini-latest
+            - gpt-4o-mini
+            - gpt-4o-mini-2024-07-18
+            - gpt-4-turbo
+            - gpt-4-turbo-2024-04-09
+            - gpt-4-0125-preview
+            - gpt-4-turbo-preview
+            - gpt-4-1106-preview
+            - gpt-4-vision-preview
+            - gpt-4
+            - gpt-4-0314
+            - gpt-4-0613
+            - gpt-4-32k
+            - gpt-4-32k-0314
+            - gpt-4-32k-0613
+            - gpt-3.5-turbo
+            - gpt-3.5-turbo-16k
+            - gpt-3.5-turbo-0301
+            - gpt-3.5-turbo-0613
+            - gpt-3.5-turbo-1106
+            - gpt-3.5-turbo-0125
+            - gpt-3.5-turbo-16k-0613
+          - type: string
+            enum:
+            - o1-pro
+            - o1-pro-2025-03-19
+            - o3-pro
+            - o3-pro-2025-06-10
+            - o3-deep-research
+            - o3-deep-research-2025-06-26
+            - o4-mini-deep-research
+            - o4-mini-deep-research-2025-06-26
+            - computer-use-preview
+            - computer-use-preview-2025-03-11
+            - gpt-5-codex
+          title: Model
+        object:
+          type: string
+          const: response
+          title: Object
+        output:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ResponseOutputMessage'
+            - $ref: '#/components/schemas/ResponseFileSearchToolCall'
+            - $ref: '#/components/schemas/ResponseFunctionToolCall'
+            - $ref: '#/components/schemas/ResponseFunctionWebSearch'
+            - $ref: '#/components/schemas/ResponseComputerToolCall'
+            - $ref: '#/components/schemas/ResponseReasoningItem'
+            - $ref: '#/components/schemas/ImageGenerationCall'
+            - $ref: '#/components/schemas/ResponseCodeInterpreterToolCall'
+            - $ref: '#/components/schemas/LocalShellCall'
+            - $ref: '#/components/schemas/McpCall'
+            - $ref: '#/components/schemas/McpListTools'
+            - $ref: '#/components/schemas/McpApprovalRequest'
+            - $ref: '#/components/schemas/ResponseCustomToolCall'
+          type: array
+          title: Output
+        parallel_tool_calls:
+          type: boolean
+          title: Parallel Tool Calls
+        temperature:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Temperature
+        tool_choice:
+          anyOf:
+          - type: string
+            enum:
+            - none
+            - auto
+            - required
+          - $ref: '#/components/schemas/ToolChoiceAllowed'
+          - $ref: '#/components/schemas/ToolChoiceTypes'
+          - $ref: '#/components/schemas/ToolChoiceFunction-Output'
+          - $ref: '#/components/schemas/ToolChoiceMcp'
+          - $ref: '#/components/schemas/ToolChoiceCustom'
+          title: Tool Choice
+        tools:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/FunctionTool-Output'
+            - $ref: '#/components/schemas/FileSearchTool'
+            - $ref: '#/components/schemas/ComputerTool'
+            - $ref: '#/components/schemas/WebSearchTool'
+            - $ref: '#/components/schemas/Mcp'
+            - $ref: '#/components/schemas/CodeInterpreter'
+            - $ref: '#/components/schemas/ImageGeneration'
+            - $ref: '#/components/schemas/LocalShell'
+            - $ref: '#/components/schemas/CustomTool'
+            - $ref: '#/components/schemas/WebSearchPreviewTool'
+          type: array
+          title: Tools
+        top_p:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Top P
+        background:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Background
+        conversation:
+          anyOf:
+          - $ref: '#/components/schemas/Conversation'
+          - type: 'null'
+        max_output_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Output Tokens
+        max_tool_calls:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Tool Calls
+        previous_response_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Previous Response Id
+        prompt:
+          anyOf:
+          - $ref: '#/components/schemas/ResponsePrompt'
+          - type: 'null'
+        prompt_cache_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prompt Cache Key
+        reasoning:
+          anyOf:
+          - $ref: '#/components/schemas/Reasoning'
+          - type: 'null'
+        safety_identifier:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Safety Identifier
+        service_tier:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - default
+            - flex
+            - scale
+            - priority
+          - type: 'null'
+          title: Service Tier
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - completed
+            - failed
+            - in_progress
+            - cancelled
+            - queued
+            - incomplete
+          - type: 'null'
+          title: Status
+        text:
+          anyOf:
+          - $ref: '#/components/schemas/ResponseTextConfig'
+          - type: 'null'
+        top_logprobs:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Top Logprobs
+        truncation:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - disabled
+          - type: 'null'
+          title: Truncation
+        usage:
+          anyOf:
+          - $ref: '#/components/schemas/ResponseUsage'
+          - type: 'null'
+        user:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User
+        completed_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Completed At
+          description: Unix timestamp when the response was completed (set by vllm).
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - created_at
+      - model
+      - object
+      - output
+      - parallel_tool_calls
+      - tool_choice
+      - tools
+      title: ResponsesResult
+      description: 'Result from the responses endpoint (/v1/responses).
+
+
+        Inherits OpenAI''s response schema and includes ``completed_at`` set by
+
+        this endpoint after the upstream response is received.'
+      examples:
+      - completed_at: 1773872348
+        created_at: 1773872348
+        id: resp_123
+        model: MultiverseComputingCAI/Hypernova-60B-2602
+        object: response
+        output:
+        - content:
+          - text: Hello!
+            type: output_text
+          role: assistant
+          type: message
+        status: completed
+        usage:
+          input_tokens: 12
+          output_tokens: 3
+          total_tokens: 15
+    Result:
+      properties:
+        attributes:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - type: number
+              - type: boolean
+            type: object
+          - type: 'null'
+          title: Attributes
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+        score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Score
+        text:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Text
+      additionalProperties: true
+      type: object
+      title: Result
+    S3Uri:
+      properties:
+        bucket:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bucket
+          description: S3 bucket name.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Object key within the bucket.
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+          description: AWS region.
+        s3_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: S3 Uri
+          description: Full S3 URI (e.g. s3://bucket/...).
+      additionalProperties: true
+      type: object
+      title: S3Uri
+      description: 'S3 location JSONB shape: ``{bucket, key, region, s3_uri}``.'
+    Summary:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: summary_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: Summary
+    Text:
+      properties:
+        type:
+          type: string
+          const: text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: Text
+    Tool:
+      properties:
+        type:
+          type: string
+          const: function
+          title: Type
+        function:
+          $ref: '#/components/schemas/FunctionTool-Input'
+      type: object
+      required:
+      - type
+      - function
+      title: Tool
+    ToolChoiceAllowed:
+      properties:
+        mode:
+          type: string
+          enum:
+          - auto
+          - required
+          title: Mode
+        tools:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Tools
+        type:
+          type: string
+          const: allowed_tools
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - mode
+      - tools
+      - type
+      title: ToolChoiceAllowed
+    ToolChoiceCustom:
+      properties:
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          const: custom
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - type
+      title: ToolChoiceCustom
+    ToolChoiceFunction-Input:
+      properties:
+        type:
+          type: string
+          const: function
+          title: Type
+        function:
+          additionalProperties:
+            type: string
+          type: object
+          title: Function
+      type: object
+      required:
+      - type
+      - function
+      title: ToolChoiceFunction
+    ToolChoiceFunction-Output:
+      properties:
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          const: function
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - type
+      title: ToolChoiceFunction
+    ToolChoiceMcp:
+      properties:
+        server_label:
+          type: string
+          title: Server Label
+        type:
+          type: string
+          const: mcp
+          title: Type
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      additionalProperties: true
+      type: object
+      required:
+      - server_label
+      - type
+      title: ToolChoiceMcp
+    ToolChoiceTypes:
+      properties:
+        type:
+          type: string
+          enum:
+          - file_search
+          - web_search_preview
+          - computer_use_preview
+          - web_search_preview_2025_03_11
+          - image_generation
+          - code_interpreter
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ToolChoiceTypes
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    WebSearchPreviewTool:
+      properties:
+        type:
+          type: string
+          enum:
+          - web_search_preview
+          - web_search_preview_2025_03_11
+          title: Type
+        search_context_size:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Search Context Size
+        user_location:
+          anyOf:
+          - $ref: '#/components/schemas/openai__types__responses__web_search_preview_tool__UserLocation'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: WebSearchPreviewTool
+    WebSearchTool:
+      properties:
+        type:
+          type: string
+          enum:
+          - web_search
+          - web_search_2025_08_26
+          title: Type
+        filters:
+          anyOf:
+          - $ref: '#/components/schemas/Filters'
+          - type: 'null'
+        search_context_size:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Search Context Size
+        user_location:
+          anyOf:
+          - $ref: '#/components/schemas/openai__types__responses__web_search_tool__UserLocation'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: WebSearchTool
+    openai__types__responses__web_search_preview_tool__UserLocation:
+      properties:
+        type:
+          type: string
+          const: approximate
+          title: Type
+        city:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: City
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+        timezone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Timezone
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: UserLocation
+    openai__types__responses__web_search_tool__UserLocation:
+      properties:
+        city:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: City
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+        timezone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Timezone
+        type:
+          anyOf:
+          - type: string
+            const: approximate
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      title: UserLocation
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
+servers:
+- url: https://api.compactif.ai
+  description: CompactifAI API production base URL (host the spec is served from;
+    docs.compactif.ai documents this base)

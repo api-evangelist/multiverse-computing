@@ -1,0 +1,129 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/multiverse-computing-compactifai-openapi.yml
+status: candidate
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: probed
+search_evidence:
+- url: https://api.compactif.ai/mcp
+  method: POST tools/list
+  status: 404
+- url: https://api.compactif.ai/v1/mcp
+  method: POST tools/list
+  status: 404
+- url: https://mcp.compactif.ai/
+  status: DNS NXDOMAIN
+- url: https://docs.compactif.ai/mcp
+  status: 403
+  note: S3 AccessDenied — the path does not exist on the docs bucket.
+- source: https://docs.compactif.ai/sitemap-0.xml
+  status: 200
+  note: 'The full docs sitemap (42 URLs) contains no MCP page. The integrations section
+    covers Claude Code, Cursor, GitHub Copilot, OpenCode, LiteLLM, Hermes Agent and
+    OpenClaw — all configured as an OpenAI-compatible base URL, none as an MCP server.'
+- source: npm + PyPI registry search
+  note: No @multiverse*/mcp or compactifai-mcp package published.
+finding: 'Multiverse Computing ships NO MCP server for the CompactifAI API — neither a
+  remote endpoint nor a stdio package. The tools below are a DERIVED candidate set,
+  generated from the published OpenAPI operations. They are not offered by the provider and
+  no MCP client can call them today.'
+note_on_mcp_in_the_spec: 'The OpenAPI does contain MCP-named schemas (Mcp, McpCall,
+  McpListTools, McpApprovalRequest, ToolChoiceMcp, McpRequireApprovalMcpToolApprovalFilter).
+  These are inherited from the OpenAI Responses API type set and describe MCP servers the
+  CALLER may attach as tools to a /v1/responses request. They do not mean CompactifAI
+  exposes itself as an MCP server, and must not be read as one.'
+tools:
+- name: list_models
+  description: List the CompactifAI model IDs available to the caller.
+  rest: get_model_info_list_v1_models_get
+  method: GET
+  path: /v1/models
+  inputSchema:
+    type: object
+    properties: {}
+- name: get_model
+  description: Retrieve information about one CompactifAI model.
+  rest: get_model_info_v1_models__model__get
+  method: GET
+  path: /v1/models/{model}
+  inputSchema:
+    type: object
+    properties:
+      model:
+        type: string
+        description: Model ID, e.g. hypernova-60b.
+    required:
+    - model
+- name: chat_completion
+  description: Generate a chat completion from a CompactifAI model.
+  rest: chat_completions_v1_chat_completions_post
+  method: POST
+  path: /v1/chat/completions
+  consequence: billed
+  inputSchema_ref: '#/components/schemas/ChatCompletionRequest'
+- name: text_completion
+  description: Generate a text completion from a prompt.
+  rest: complete_prompt_v1_completions_post
+  method: POST
+  path: /v1/completions
+  consequence: billed
+  inputSchema_ref: '#/components/schemas/CompletionRequest'
+- name: create_response
+  description: Create a response via the OpenAI-compatible Responses API.
+  rest: post_responses_v1_responses_post
+  method: POST
+  path: /v1/responses
+  consequence: billed
+  inputSchema_ref: '#/components/schemas/ResponsesRequest'
+- name: get_response
+  description: Retrieve a previously stored response (store:true only, owner-scoped).
+  rest: get_response_v1_responses__response_id__get
+  method: GET
+  path: /v1/responses/{response_id}
+- name: transcribe_audio
+  description: Transcribe an audio file with the compressed Whisper model.
+  rest: create_transcription_v1_audio_transcriptions_post
+  method: POST
+  path: /v1/audio/transcriptions
+  consequence: billed
+  inputSchema_note: multipart/form-data; the spec declares no typed body schema.
+- name: upload_file
+  description: Upload a file for use with batches or the Responses API.
+  rest: post_files_v1_files_post
+  method: POST
+  path: /v1/files
+  consequence: irreversible
+  note: No delete operation exists.
+- name: get_file_content
+  description: Download the raw bytes of an uploaded file.
+  rest: get_file_content_v1_files__file_id__content_get
+  method: GET
+  path: /v1/files/{file_id}/content
+- name: create_batch
+  description: Create an async batch inference job from an uploaded input file.
+  rest: create_batch_v1_batches_post
+  method: POST
+  path: /v1/batches
+  consequence: billed
+  inputSchema_ref: '#/components/schemas/BatchCreateParams'
+- name: list_batches
+  description: List batch jobs (cursor paginated with after/limit).
+  rest: get_batches_v1_batches_get
+  method: GET
+  path: /v1/batches
+- name: get_batch
+  description: Retrieve one batch job and its live status.
+  rest: get_batch_v1_batches__batch_id__get
+  method: GET
+  path: /v1/batches/{batch_id}
+- name: cancel_batch
+  description: Request cancellation of an in-progress batch job.
+  rest: cancel_batch_v1_batches__batch_id__cancel_post
+  method: POST
+  path: /v1/batches/{batch_id}/cancel
+  reversal_of: create_batch

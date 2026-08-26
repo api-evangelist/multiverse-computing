@@ -1,0 +1,211 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/multiverse-computing-compactifai-openapi.yml
+also_searched:
+- https://docs.compactif.ai/openai-compatibility/
+- https://docs.compactif.ai/api_reference/
+- https://docs.compactif.ai/error-handling/
+- https://docs.compactif.ai/authentication/
+- https://docs.compactif.ai/faq/
+api_style: REST/JSON, OpenAI-compatible
+base_urls:
+- url: https://api.compactif.ai/v1
+  scope: global
+  note: Routes each request to whichever region is fastest at that moment.
+- url: https://api-eu.compactif.ai/v1
+  scope: EU data residency
+- url: https://api-us.compactif.ai/v1
+  scope: US data residency
+  source: https://docs.compactif.ai/faq/
+authentication:
+  style: bearer-api-key
+  header: Authorization
+  format: Bearer <API key>
+  scopes: none
+  cross_ref: authentication/multiverse-computing-authentication.yml
+idempotency:
+  supported: false
+  header: null
+  scope: null
+  retention: null
+  evidence:
+  - No Idempotency-Key (or equivalent) header appears anywhere in the 13-operation OpenAPI.
+  - The string "idempoten" does not occur in the OpenAPI document or in any page of
+    docs.compactif.ai.
+  mitigations:
+  - name: seed
+    available: false
+    note: 'Unlike OpenAI''s chat completions, ChatCompletionRequest here declares no `seed`
+      parameter, so even deterministic-sampling replay is unavailable.'
+  - name: client-supplied correlation id
+    available: true
+    header: x-request-id
+    note: 'x-request-id is an optional REQUEST header on 11 of the 13 operations, so a
+      client can supply its own correlation value — but nothing in the contract says the
+      server deduplicates on it. It is a tracing identifier, not an idempotency key.'
+  consequence: 'A retried POST /v1/chat/completions, /v1/completions, /v1/responses or
+    /v1/batches is billed and executed again. For an agent, the safe posture is
+    at-most-once: do not blind-retry a write, reconcile with GET /v1/batches or
+    GET /v1/responses/{response_id} first.'
+pagination:
+  supported: true
+  style: cursor
+  operations:
+  - get_batches_v1_batches_get
+  request_params:
+  - name: after
+    in: query
+    required: false
+    description: 'A cursor for pagination: the object id after which to start.'
+  - name: limit
+    in: query
+    required: false
+    minimum: 1
+    maximum: 100
+    description: Maximum number of items to return.
+  response_envelope:
+    schema: BatchList
+    fields:
+    - object
+    - data
+    - has_more
+    - first_id
+    - last_id
+  note: 'Only the batches list is paginated. GET /v1/models returns the full catalog with
+    no cursor and no limit.'
+field_expansion:
+  supported: false
+  note: No expand/fields/include parameter on any operation.
+metadata:
+  supported: true
+  where: BatchCreateParams.metadata and Batch.metadata
+  note: Free-form caller metadata is supported on batch jobs only.
+request_tracing:
+  request_header: x-request-id
+  response_header: x-request-id
+  additional_response_headers:
+  - x-served-by-region
+  - x-envoy-upstream-service-time
+  observed:
+    url: https://api.compactif.ai/v1/models
+    status: 401
+    x-served-by-region: us-east-1
+  note: 'x-request-id is both accepted on the request (optional, declared on 11 operations)
+    and returned on every response. x-app-id is a second optional request header on the
+    four inference operations. Neither is documented on docs.compactif.ai.'
+versioning:
+  style: path-prefix
+  current: v1
+  policy_published: false
+  cross_ref: lifecycle/multiverse-computing-lifecycle.yml
+error_envelope:
+  primary: '{"error": {"type", "message", "param", "code"}}'
+  secondary: '{"detail": ...}'
+  rfc9457: false
+  cross_ref: errors/multiverse-computing-problem-types.yml
+rate_limit_signaling:
+  documented: false
+  headers: []
+  status_on_exhaustion: undocumented
+  cross_ref: rate-limits/multiverse-computing-rate-limits.yml
+streaming:
+  supported: true
+  transport: Server-Sent Events
+  parameter: 'stream: true'
+  operations:
+  - chat_completions_v1_chat_completions_post
+  - complete_prompt_v1_completions_post
+  - post_responses_v1_responses_post
+  - create_transcription_v1_audio_transcriptions_post
+  source: https://docs.compactif.ai/faq/
+content_types:
+  json: application/json
+  uploads: multipart/form-data (POST /v1/files, POST /v1/audio/transcriptions)
+  binary_download: GET /v1/files/{file_id}/content returns raw bytes
+dry_run_mode:
+  supported: false
+  note: No preview/validate/dry-run parameter or endpoint exists. There is also no
+    tokenizer or cost-estimate endpoint, so an agent cannot price a call before making it.
+reversibility:
+  grade: documented
+  applicable: true
+  summary: 'One real reversal path exists — batch cancellation — and no window is stated
+    for it. Every other write on this API is an inference call that is billed at the moment
+    it is made and cannot be taken back.'
+  surfaces:
+  - operation: create_batch_v1_batches_post
+    method: POST
+    path: /v1/batches
+    reversal:
+      exists: true
+      operation: cancel_batch_v1_batches__batch_id__cancel_post
+      method: POST
+      path: /v1/batches/{batch_id}/cancel
+      semantics: 'Requests cancellation of an in-progress batch; returns the updated Batch,
+        usually with status "cancelling" and cancelling_at set. The Batch object also
+        carries cancelled_at, so the terminal cancelled state is observable.'
+    window:
+      stated: false
+      value: null
+      evidence: 'The spec says cancellation applies to an "in-progress" batch, which bounds
+        it by job state rather than by time. Neither docs.compactif.ai nor the OpenAPI
+        states how long cancellation remains possible, how long the batch sits in
+        "cancelling", or whether already-completed requests inside the batch are still
+        billed. BatchCreateParams.completion_window and Batch.expires_at exist but describe
+        when the job must FINISH, not how long it can be cancelled.'
+      source: openapi/multiverse-computing-compactifai-openapi.yml
+    grade: documented
+  - operation: post_files_v1_files_post
+    method: POST
+    path: /v1/files
+    reversal:
+      exists: false
+      note: 'There is no DELETE /v1/files/{file_id}. The API can upload a file and read it
+        back, but publishes no way to remove one. OutputExpiresAfter /
+        BatchCreateParams.output_expires_after governs expiry of batch OUTPUT files only.'
+    window:
+      stated: false
+    grade: none
+  - operation: chat_completions_v1_chat_completions_post
+    method: POST
+    path: /v1/chat/completions
+    reversal:
+      exists: false
+      note: Inference is executed and metered on receipt. No void, no refund, no credit
+        path is published.
+    grade: none
+  - operation: complete_prompt_v1_completions_post
+    method: POST
+    path: /v1/completions
+    reversal:
+      exists: false
+    grade: none
+  - operation: post_responses_v1_responses_post
+    method: POST
+    path: /v1/responses
+    reversal:
+      exists: false
+      note: 'Responses created with store:true are retrievable via
+        GET /v1/responses/{response_id} but there is no delete operation, so a stored
+        response cannot be withdrawn through the API.'
+    grade: none
+  - operation: create_transcription_v1_audio_transcriptions_post
+    method: POST
+    path: /v1/audio/transcriptions
+    reversal:
+      exists: false
+    grade: none
+  mitigating_context:
+  - 'Zero Data Retention is the provider''s stated default: prompts and completions are
+    never stored, so "undo" for an inference call is largely moot on the privacy axis —
+    but not on the billing axis, since token usage is metered and invoiced monthly.
+    Source: https://docs.compactif.ai/data-privacy/'
+  agent_guidance: 'Before firing a batch, confirm the caller accepts that cancellation is
+    best-effort with no stated window and no stated billing consequence. Treat every
+    completion call as irreversible and billed.'
+cross_references:
+  authentication: authentication/multiverse-computing-authentication.yml
+  errors: errors/multiverse-computing-problem-types.yml
+  lifecycle: lifecycle/multiverse-computing-lifecycle.yml
+  rate_limits: rate-limits/multiverse-computing-rate-limits.yml
+  plans: plans/multiverse-computing-plans-pricing.yml

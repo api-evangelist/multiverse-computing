@@ -1,0 +1,49 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.compactif.ai/
+limit_count: 0
+limits: []
+response_headers: []
+exhaustion_status: null
+docs_checked:
+- url: https://docs.compactif.ai/api_reference/
+  status: 200
+  finding: No rate limit, quota, throttling, 429 or Retry-After language anywhere in
+    the API reference.
+- url: https://docs.compactif.ai/error-handling/
+  status: 200
+  finding: 'Documented HTTP error codes are 400 invalid_request_error, 401 authentication_error,
+    404 not_found_error and 500 server_error. 429 is not documented at all.'
+- url: https://docs.compactif.ai/faq/
+  status: 200
+  finding: No rate-limit FAQ entry; the only usage-governing statement is pay-as-you-go
+    billing with no minimum spend.
+- url: https://docs.compactif.ai/pricing/
+  status: 200
+  finding: Pricing is purely per-token; no tier attaches a request-rate or concurrency
+    limit.
+probes:
+- url: https://api.compactif.ai/v1/models
+  status: 401
+  observed_headers:
+  - server
+  - date
+  - content-type
+  - content-length
+  - x-request-id
+  - x-served-by-region
+  - x-envoy-upstream-service-time
+  finding: 'No X-RateLimit-*, RateLimit-* or Retry-After header on an unauthenticated
+    response. The edge is istio-envoy and returns a per-request x-request-id plus an
+    x-served-by-region (observed: us-east-1) and x-envoy-upstream-service-time.'
+spec_check:
+  file: openapi/multiverse-computing-compactifai-openapi.yml
+  finding: The OpenAPI declares only 200/201/404/422 responses. There is no 429
+    response and no rate-limit header defined on any of the 13 operations.
+notes:
+- 'Honest zero: CompactifAI publishes no rate limits, no quota, no concurrency ceiling
+  and no 429 semantics in its public documentation or its OpenAPI, and returns no
+  rate-limit headers on an anonymous request. An agent has no runtime signal to back off
+  on, and no documented number to plan against.'
+- The only runtime governance signal the API returns is x-request-id, which is useful for
+  support correlation but carries no limit information.

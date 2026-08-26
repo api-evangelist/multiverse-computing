@@ -1,0 +1,129 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/multiverse-computing-compactifai-openapi.yml
+also_searched:
+- https://docs.compactif.ai/openai-compatibility/
+- https://docs.compactif.ai/data-privacy/
+- https://docs.compactif.ai/faq/
+- https://multiversecomputing.com/privacy-policy
+- https://multiversecomputing.com/legal-notice
+- https://multiversecomputing.com/quality-and-environmental-policy
+conformance:
+- id: openapi-3.1
+  conforms: true
+  evidence: 'openapi/_original/multiverse-computing-compactifai-openapi.json declares
+    "openapi": "3.1.0" and parses; 13 operations across 12 paths, all with operationIds and
+    summaries. Served publicly and unauthenticated at https://api.compactif.ai/openapi.json
+    (HTTP 200, application/json), and identically at api-eu.compactif.ai and
+    api-us.compactif.ai (byte-identical, sha256 a1ef46ae0e83c94b…).'
+- id: oauth2
+  conforms: false
+  evidence: The only securityScheme is HTTPBearer (http/bearer). No oauth2 flows, no
+    /.well-known/oauth-authorization-server (404 on every host), no token endpoint.
+- id: oidc
+  conforms: false
+  evidence: '/.well-known/openid-configuration returns 404 on api.compactif.ai,
+    api-eu.compactif.ai, api-us.compactif.ai and docs.compactif.ai (403 S3 AccessDenied),
+    and 404 on multiversecomputing.com. End-user sign-in to the Dashboard uses Multiverse
+    IAM with an emailed OTP, but no OIDC discovery document is published.'
+- id: rfc9457
+  conforms: false
+  evidence: 'Errors are application/json with an OpenAI-shaped {"error":{...}} envelope, or
+    a bare {"detail":...}. No application/problem+json content type appears in the spec or
+    on a live 401/404.'
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt returns 404 on api.compactif.ai, api-eu, api-us and
+    multiversecomputing.com, and 403 (S3 AccessDenied) on docs.compactif.ai. Security
+    reports are routed through the support form instead.
+- id: rfc8594-sunset
+  conforms: false
+  evidence: No Sunset or Deprecation response header is declared in the spec or observed
+    live, and the changelog announces removals after the fact.
+- id: pagination
+  conforms: true
+  evidence: 'GET /v1/batches implements cursor pagination with `after` and `limit` (1–100)
+    and returns the OpenAI list envelope BatchList {object, data, has_more, first_id,
+    last_id}. Only this one operation paginates.'
+- id: idempotency
+  conforms: false
+  evidence: No Idempotency-Key header on any operation; the string "idempoten" does not
+    appear in the spec or in the published documentation. See
+    conventions/multiverse-computing-conventions.yml.
+- id: server-sent-events
+  conforms: true
+  evidence: 'Streaming responses are delivered as Server-Sent Events when `stream: true`,
+    documented at https://docs.compactif.ai/faq/ and supported on chat completions,
+    completions, responses and audio transcriptions.'
+- id: json-schema-2020-12
+  conforms: true
+  evidence: OpenAPI 3.1.0 uses JSON Schema 2020-12 for its component schemas; the spec
+    declares 150+ components.schemas and uses anyOf/$ref throughout.
+- id: gdpr
+  conforms: partial
+  evidence: 'Multiverse Computing, S.L. is a Spanish (EU) entity (Paseo Miramon 170,
+    Donostia-San Sebastian, tax ID B-75218040, per
+    https://multiversecomputing.com/legal-notice) and publishes a privacy policy plus a
+    Zero Data Retention statement: prompts and completions are not stored, anonymized
+    request logs are deleted after 30 days, and the user identifier is stripped and
+    replaced with a random request ID. Dedicated EU (api-eu.compactif.ai) and US
+    (api-us.compactif.ai) endpoints allow data-residency selection. No DPA, no
+    sub-processor list and no certification is published, so this is recorded as partial
+    rather than conformant.'
+- id: soc2
+  conforms: false
+  evidence: No trust center, no SOC 2 report and no certification page found.
+    probe-security-programs.py returned trust=none across trust./security./compliance
+    paths on multiversecomputing.com and compactif.ai.
+- id: iso-27001
+  conforms: false
+  evidence: Not named anywhere on the website or docs. The only ISO standard mentioned
+    company-wide is ISO 14001, and it is described as "certification readiness" (a goal),
+    on https://multiversecomputing.com/quality-and-environmental-policy — an environmental
+    management standard, not an information-security one, and therefore not an API
+    compliance signal.
+domain_standard:
+  market: LLM inference / model-serving APIs
+  standard: OpenAI API compatibility (de-facto interoperability standard for LLM inference
+    endpoints)
+  declared: true
+  conforms: true
+  evidence:
+  - location: openapi/multiverse-computing-compactifai-openapi.yml paths
+    detail: 'The contract implements the OpenAI request/response surface verbatim under
+      /v1: /v1/chat/completions, /v1/completions, /v1/responses, /v1/responses/{id},
+      /v1/batches (+ list, retrieve, cancel), /v1/files, /v1/files/{id}/content,
+      /v1/models, /v1/models/{model}, /v1/audio/transcriptions.'
+  - location: openapi operation descriptions
+    detail: 'The spec states the compatibility in its own text: "OpenAI-compatible POST
+      `/v1/audio/transcriptions`", "Accepts OpenAI ``BatchCreateParams``", "List batch jobs
+      (OpenAI-compatible: ``GET /v1/batches`` with ``after``, ``limit``, and list
+      envelope)", "Returns a ChatCompletionResponse in OpenAI-compatible format",
+      "Matches ``POST /v1/batches/{batch_id}/cancel``".'
+  - location: openapi components.schemas
+    detail: 'Component names are the OpenAI type names — ChatCompletionRequest,
+      ChatCompletionAssistantMessageParam, ChatCompletionContentPartImageParam,
+      ResponseOutputMessage, ResponseFunctionToolCall, BatchCreateParams, BatchList,
+      FileObject, CompletionUsage — including two schemas whose keys are the literal OpenAI
+      Python module paths (openai__types__responses__web_search_tool__UserLocation).'
+  - location: https://docs.compactif.ai/openai-compatibility/
+    detail: A dedicated documentation page for OpenAI compatibility, linking to
+      platform.openai.com API reference pages and to the openai-python and openai-node
+      SDKs as the recommended clients.
+  buyer_impact: 'A team already calling OpenAI integrates by changing base_url and the
+    model ID; no bespoke connector is needed. This is the whole commercial premise of the
+    product.'
+  caveats:
+  - 'Compatibility is a surface claim, not a version claim: no OpenAI API version or dated
+    schema revision is named, so drift is unmanaged on both sides.'
+  - 'Parameter coverage diverges. ChatCompletionRequest omits `seed` and `logprobs` and
+    adds three non-OpenAI parameters — `min_tokens`, `ignore_eos`, `reasoning_enabled` —
+    so a strict OpenAI client will not exercise the whole surface and a CompactifAI-tuned
+    client is not portable back.'
+  - 'The FAQ note that streaming, tools and response_format are supported is documentation,
+    not contract: the spec does not mark which models honour which parameter, while the
+    changelog shows tool calling arriving model-by-model.'
+notes:
+- 'REWARD-ONLY reading: LLM inference has no formal SDO standard. OpenAI API compatibility
+  is the de-facto one, it is declared inside the contract rather than only on a marketing
+  page, and it is implemented across the whole 13-operation surface.'

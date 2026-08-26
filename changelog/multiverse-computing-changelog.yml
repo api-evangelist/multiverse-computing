@@ -1,0 +1,124 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.compactif.ai/changelog/
+docs: https://docs.compactif.ai/changelog/
+scheme:
+  style: dated
+  format: 'Date-headed sections (YYYY-MM-DD) with Added / Removed / Deprecated /
+    Improvements / Performance / Bug Fixes / Security subsections'
+  versioned_api: false
+  api_version_in_path: v1
+  spec_version: 0.1.1
+  note: 'The API is versioned only by the /v1 path prefix; the OpenAPI info.version is
+    0.1.1 and does not change with the dated changelog entries. Change is tracked at the
+    MODEL level, not the endpoint level.'
+first_entry: '2025-06-11'
+latest_entry: '2026-08-05'
+entries:
+- date: '2026-08-05'
+  breaking: false
+  additions:
+  - 'quasar-438b — Quasar 438B chat model with tool calling and structured output via
+    POST /v1/chat/completions. In beta; capabilities identical to GLM 5.2.'
+- date: '2026-07-15'
+  breaking: false
+  additions:
+  - 'glm-5-2 — GLM 5.2 chat model with tool calling and structured output. Available for
+    functional validation only; performance KPIs not guaranteed during beta.'
+  - GitHub Copilot integration guide (OpenAI-compatible custom provider).
+- date: '2026-06'
+  date_precision: month
+  breaking: true
+  additions:
+  - carina-60b — Carina 60B chat model.
+  - cai-glm-5-1 — GLM 5.1 (Uncensored) chat model.
+  - qwen-3-6-27b — Qwen 3.6 27B (Uncensored), published by Multiverse Computing.
+  removals:
+  - 'Models removed: llama-4-scout, cai-llama-3-3-70b-slim, llama-3-3-70b, llama-3-1-8b,
+    blackstar-10b, gpt-oss-20b, whisper-large-v3, glm-5-2. Consumers must migrate to an
+    alternative from the models catalog.'
+  note: 'The changelog section carrying these removals has no explicit date heading on the
+    published page; it sits between the 2026-07-15 and 2026-05-06 entries, so it is
+    recorded here at month precision rather than asserting a day.'
+- date: '2026-05-06'
+  breaking: false
+  additions:
+  - glm-5-1 — GLM 5.1 chat model with tool calling and structured output.
+  - nemotron-3-nano-omni — multimodal model (text and image inputs via chat completions).
+  - Cursor and OpenCode integration guides.
+  improvements:
+  - hypernova-60b upgraded to version 2605.
+- date: '2026-04-01'
+  breaking: true
+  removals:
+  - DeepSeek R1 0528 Slim removed.
+- date: '2026-03-24'
+  breaking: true
+  removals:
+  - 'POST /v1/usage/completions (usage statistics API) deprecated AND removed; the route
+    is no longer served. Migration: view usage and billing in the CompactifAI Dashboard.'
+  note: The only documented removal of an HTTP endpoint in the API's history.
+- date: '2026-03-10'
+  breaking: false
+  additions:
+  - Whisper audio transcription endpoint now supports streaming.
+  - GLM-5 available as a private model in the US region (private preview).
+  - Agentic tool-calling enhancements (beta) for gpt-oss-20b, gpt-oss-120b, hypernova-60b.
+  improvements:
+  - Deterministic tool usage in agent loops when tool_choice=required or a named tool.
+  - Reduced tool-call hallucination, better adherence to tool schemas.
+  - ~30% higher inference throughput across several models.
+  fixes:
+  - Streaming with tool calling fixed for gpt-oss-20b, gpt-oss-120b, hypernova-60b.
+- date: '2026-02-25'
+  breaking: false
+  additions:
+  - Tool calling support for hypernova-60b.
+- date: '2026-02-16'
+  breaking: false
+  fixes:
+  - Audio transcription accepted all documented MIME types.
+  - 'Audio transcription performance: speed factor raised from 15x to 100x on a 10-minute
+    file; maximum file size raised from 1MB to 25MB.'
+- date: '2026-01-08'
+  breaking: false
+  additions:
+  - Tool calling support for gpt-oss-20b and gpt-oss-120b.
+- date: '2025-12-23'
+  breaking: false
+  additions:
+  - hypernova-60b added.
+- date: '2025-10-06'
+  breaking: true
+  additions:
+  - POST /v1/audio/transcriptions speech-to-text endpoint with Whisper Large V3.
+  removals:
+  - deepseek-r1-0528 model removed.
+- date: '2025-09-24'
+  breaking: false
+  additions:
+  - Multi-modality (image + text) support for chat completions.
+  - mistral-small-3-1 model added.
+- date: '2025-08-18'
+  breaking: false
+  additions:
+  - Function tool compatibility activated on all models except Mistral.
+- date: '2025-07-01'
+  breaking: false
+  additions:
+  - deepseek-r1-0528 model added.
+  deprecations:
+  - deepseek-r1 deprecated.
+- date: '2025-06-11'
+  breaking: false
+  additions:
+  - 'Initial release of the CompactifAI inference API: Models, Chat Completions and
+    Completions endpoints, OpenAI-compatible design, HTTPS + Bearer authentication.'
+  - 'Launch models: cai-llama-3-3-70b-slim, cai-mistral-small-3-1-slim.'
+notes:
+- 'The dominant change class is model add/remove, and removals are hard: models are pulled
+  with a "migrate to an alternative" instruction and no stated notice period or sunset
+  window. A caller pinning a model ID is the party carrying that risk.'
+- 'The changelog page lists entries newest-first but two blocks (the carina-60b/removals
+  block, and a 2025-12-26 block placed after 2025-12-23) are out of chronological order on
+  the published page. Recorded as published, without correcting the provider''s ordering.'

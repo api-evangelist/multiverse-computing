@@ -1,0 +1,129 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/_original/multiverse-computing-compactifai-openapi.json (fetched verbatim from https://api.compactif.ai/openapi.json)
+summary:
+  examples_in_spec: 6
+  schemas_with_examples: 5
+  operations_with_response_examples: 0
+  note: Every example in the CompactifAI contract lives on a components.schemas entry, not on an operation
+    request/response. No path item declares an example. Extracted verbatim here, unmodified.
+defects:
+- Four of the five examples name the model `cai-llama-3-1-8b-slim`, which was REMOVED from the API (the
+  removals block in https://docs.compactif.ai/changelog/ withdraws llama-3-1-8b and cai-llama-3-3-70b-slim).
+  Copy-pasting the published examples produces a 400 invalid_request_error.
+- The ResponsesResult example names the model as `MultiverseComputingCAI/Hypernova-60B-2602`, a HuggingFace-style
+  repo path, while every other surface (pricing page, models catalog, all other examples) uses the API
+  model ID `hypernova-60b`. The contract is inconsistent with itself about what a model identifier looks
+  like.
+- The four operations with an empty 200 schema (chat completions, models list, model info, audio transcriptions)
+  also carry no example, so the flagship endpoint of the product has neither a response type nor a sample
+  response.
+examples:
+- schema: ChatCompletionRequest
+  location: components.schemas.ChatCompletionRequest.examples
+  example:
+    max_tokens: 128
+    messages:
+    - content: You are a helpful assistant.
+      role: system
+    - content: Hello, I'm Camillo
+      role: user
+    - content: What is my name? What is the capital of Colombia?
+      role: user
+    model: cai-llama-3-1-8b-slim
+    n: 1
+    stop:
+    - '###'
+    temperature: 0.7
+    tool_choice: auto
+    tools:
+    - function:
+        description: Get the current weather in a given location.
+        name: get_weather
+        parameters:
+          properties:
+            location:
+              type: string
+            unit:
+              enum:
+              - celsius
+              - fahrenheit
+              type: string
+          required:
+          - location
+          type: object
+      type: function
+    user: user-123
+- schema: ChatCompletionRequest
+  location: components.schemas.ChatCompletionRequest.examples
+  example:
+    max_tokens: 128
+    messages:
+    - content:
+      - text: What do you see in this image? Describe it in detail.
+        type: text
+      - image_url:
+          url: https://cdn.britannica.com/86/170586-120-7E23E561/Taj-Mahal-Agra-India.jpg
+        type: image_url
+      role: user
+    model: mistral-small-3-1
+    n: 1
+    stop:
+    - '###'
+    temperature: 0.7
+    user: user-123
+- schema: CompletionRequest
+  location: components.schemas.CompletionRequest.examples
+  example:
+    max_tokens: 128
+    model: cai-llama-3-1-8b-slim
+    prompt: What is the capital of France ?
+    stop:
+    - '###'
+    temperature: 0.7
+    top_p: 0.9
+    user: user-123
+- schema: CompletionResponse
+  location: components.schemas.CompletionResponse.examples
+  example:
+    choices:
+    - finish_reason: stop
+      index: 0
+      text: The capital of France is Paris.
+    created: 1740395337
+    id: 1861edc39ce648e3862a0b6ae9b7687b
+    model: cai-llama-3-1-8b-slim
+    object: text_completion
+    usage:
+      completion_tokens: 7
+      prompt_tokens: 5
+      total_tokens: 12
+- schema: ResponsesRequest
+  location: components.schemas.ResponsesRequest.examples
+  example:
+    input: Say hello in one short sentence.
+    model: cai-llama-3-1-8b-slim
+    reasoning: {}
+    store: false
+    text:
+      format:
+        type: text
+- schema: ResponsesResult
+  location: components.schemas.ResponsesResult.examples
+  example:
+    completed_at: 1773872348
+    created_at: 1773872348
+    id: resp_123
+    model: MultiverseComputingCAI/Hypernova-60B-2602
+    object: response
+    output:
+    - content:
+      - text: Hello!
+        type: output_text
+      role: assistant
+      type: message
+    status: completed
+    usage:
+      input_tokens: 12
+      output_tokens: 3
+      total_tokens: 15

@@ -1,0 +1,88 @@
+generated: '2026-08-26'
+method: searched
+source: 'https://docs.compactif.ai/changelog/, https://docs.compactif.ai/error-handling/,
+  https://status.compactif.ai/, https://docs.compactif.ai/support-contact/'
+versioning:
+  scheme: path-prefix
+  current: v1
+  spec_version: 0.1.1
+  policy_published: false
+  note: 'All operations sit under /v1. No versioning policy, no version negotiation header,
+    no dated-version scheme (unlike OpenAI''s), and no statement of what constitutes a
+    breaking change. The OpenAPI info.version (0.1.1) is not referenced anywhere in the
+    documentation.'
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  notice_period: null
+  channel: https://docs.compactif.ai/changelog/
+  evidence:
+  - 'The changelog carries a "Deprecated" subsection heading and has removed both models
+    and an endpoint (POST /v1/usage/completions, removed 2026-03-24), so deprecation
+    happens — but no page states a policy, a notice period, or a support window.'
+  - 'Model removals are announced as already-done ("These models have been removed.
+    Migrate to an alternative model from the models catalog") rather than announced ahead
+    of a sunset date.'
+  - 'No Deprecation or Sunset response header is defined in the OpenAPI or observed on a
+    live request.'
+  deprecated_operations: []
+  deprecated_in_spec: 0
+  removed_operations:
+  - operation: POST /v1/usage/completions
+    removed: '2026-03-24'
+    migration: Use the CompactifAI Dashboard for usage and billing visibility.
+    source: https://docs.compactif.ai/changelog/
+  removed_models:
+  - llama-4-scout
+  - cai-llama-3-3-70b-slim
+  - llama-3-3-70b
+  - llama-3-1-8b
+  - blackstar-10b
+  - gpt-oss-20b
+  - whisper-large-v3
+  - glm-5-2
+  - deepseek-r1-0528
+  - deepseek-r1
+  - DeepSeek R1 0528 Slim
+status_page:
+  url: https://status.compactif.ai/
+  status: 200
+  provider: first-party ("Powered by Multiverse Computing")
+  components:
+  - Chat Completions
+  - Completions
+  - Dependencies
+  - Audio Models
+  sections:
+  - Status
+  - Maintenance
+  - Incidents
+  machine_readable_feed: none found
+  note: 'The page shell is server-served but the component states are loaded client-side,
+    so a non-JS agent sees "Loading status..." rather than a status. No /api/v2/status.json,
+    RSS or Atom feed is advertised.'
+sla:
+  published: false
+  support_response: 'Same business day (documented, not contractual), with 24/7 maintenance
+    service.'
+  source: https://docs.compactif.ai/support-contact/
+  note: No uptime commitment, credit schedule or availability target is published on the
+    website, docs or status page. Enterprise terms are quoted by sales.
+beta_and_preview:
+  models_in_beta:
+  - id: quasar-438b
+    since: '2026-08-05'
+    terms: Beta.
+  - id: glm-5-2
+    since: '2026-07-15'
+    terms: 'Available for functional validation only; performance KPIs are not guaranteed
+      during this beta period.'
+  source: https://docs.compactif.ai/changelog/
+notes:
+- 'The strongest lifecycle signal here is negative and worth stating plainly: the fastest-
+  moving part of this API is the model catalog, and the model catalog has no deprecation
+  policy. Eleven model IDs have been withdrawn since launch, at least one of them
+  (glm-5-2) after being added ten weeks earlier, and callers pin model IDs in every
+  request body.'

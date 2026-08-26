@@ -1,0 +1,80 @@
+generated: '2026-08-26'
+method: searched
+source: 'npm registry search + registry.npmjs.org, pypi.org/pypi/<pkg>/json, github.com/multiverse-computing,
+  https://docs.compactif.ai/ (FAQ, integrations)'
+summary:
+  official_packages: 0
+  third_party_packages: 3
+  note: 'Multiverse Computing publishes NO first-party client library for the CompactifAI
+    API in any registry. Searched npm (registry.npmjs.org search for "compactif" and
+    "multiverse-computing"), PyPI (compactifai, compactif-ai, multiverse-computing,
+    multiversecomputing — all 404), and the GitHub organization github.com/multiverse-computing,
+    which exists but publishes 0 public repositories. The docs state the API is
+    "language-agnostic" and give raw cURL / requests / fetch examples rather than an SDK,
+    and direct developers to the OpenAI SDKs because the API is OpenAI-compatible.'
+official_sdks: []
+third_party_packages:
+- name: openai
+  registry: pypi
+  url: https://pypi.org/project/openai/
+  language: python
+  official: false
+  owner: OpenAI
+  version: 3.3.1
+  published: '2026-08-19'
+  note: 'Not a Multiverse Computing package. CompactifAI docs recommend it as the client
+    because the API is OpenAI-compatible — point base_url at https://api.compactif.ai/v1.
+    Source: https://docs.compactif.ai/openai-compatibility/'
+- name: openai
+  registry: npm
+  url: https://www.npmjs.com/package/openai
+  language: javascript
+  official: false
+  owner: OpenAI
+  version: 7.5.0
+  published: '2026-08-17'
+  note: 'Not a Multiverse Computing package. Recommended in the CompactifAI OpenAI
+    Compatibility guide for the same reason as the Python SDK.'
+- name: '@plainconcepts/n8n-nodes-compactifai'
+  registry: npm
+  url: https://www.npmjs.com/package/@plainconcepts/n8n-nodes-compactifai
+  repository: https://github.com/EvergineTeam/Multiverse.n8n
+  language: javascript
+  official: false
+  owner: Plain Concepts / Evergine team (community n8n node)
+  version: 0.1.6
+  published: '2026-08-17'
+  note: 'Community n8n node for the CompactifAI API. Published by rafaelplain
+    (rafael.caro@plainconcepts.com) under the @plainconcepts npm scope, not by Multiverse
+    Computing, so it is recorded as third-party.'
+integrations:
+- name: LiteLLM
+  kind: routing-library provider
+  package: litellm
+  registry: pypi
+  url: https://pypi.org/project/litellm/
+  version: 1.98.0
+  published: '2026-08-22'
+  official: false
+  docs: https://docs.compactif.ai/integrations/litellm/
+  note: 'LiteLLM ships a first-class `compactifai` provider (docs.litellm.ai/docs/providers/compactifai);
+    CompactifAI documents the integration but does not maintain the package.'
+- name: Claude Code
+  kind: coding agent
+  docs: https://docs.compactif.ai/integrations/claude-code/
+  note: Configuration guide only — no package published by Multiverse Computing.
+- name: Cursor
+  kind: coding agent
+  docs: https://docs.compactif.ai/integrations/cursor/
+- name: GitHub Copilot
+  kind: coding agent
+  docs: https://docs.compactif.ai/integrations/copilot/
+- name: OpenCode
+  kind: coding agent
+  docs: https://docs.compactif.ai/integrations/opencode/
+- name: Hermes Agent
+  kind: agent framework
+  docs: https://docs.compactif.ai/integrations/hermes-agent/
+- name: OpenClaw
+  kind: agent framework
+  docs: https://docs.compactif.ai/integrations/openclaw/

@@ -1,0 +1,110 @@
+# Multiverse Computing — CompactifAI API
+
+> Multiverse Computing, S.L. (Donostia-San Sebastian, Spain) operates the CompactifAI API,
+> an OpenAI-compatible LLM inference service serving tensor-network-compressed versions of
+> frontier open models alongside uncompressed third-party models. Base URL
+> https://api.compactif.ai, with EU (https://api-eu.compactif.ai) and US
+> (https://api-us.compactif.ai) data-residency endpoints. Bearer API key auth, one key per
+> account, pay-as-you-go per-token billing.
+
+Generated: 2026-08-26
+Method: generated
+Source: apis.yml plus the artifacts in this repository. No llms.txt is served by the
+provider — /llms.txt returns 404 on api.compactif.ai and on multiversecomputing.com, and
+403 (S3 AccessDenied) on docs.compactif.ai.
+
+## API surface
+
+13 operations, OpenAPI 3.1.0, published unauthenticated at
+https://api.compactif.ai/openapi.json
+
+- POST /v1/chat/completions — chat completion (streaming via `stream: true`, SSE)
+- POST /v1/completions — text completion
+- POST /v1/responses — OpenAI Responses API; `store: true` persists, owner-scoped
+- GET  /v1/responses/{response_id} — retrieve a stored response
+- POST /v1/audio/transcriptions — Whisper speech-to-text (multipart, streaming supported)
+- POST /v1/files — upload a file (multipart); no delete operation exists
+- GET  /v1/files/{file_id}/content — download raw file bytes
+- POST /v1/batches — create an async batch job from an uploaded input file
+- GET  /v1/batches — list batch jobs (cursor pagination: `after`, `limit` 1–100)
+- GET  /v1/batches/{batch_id} — retrieve a batch and its live status
+- POST /v1/batches/{batch_id}/cancel — cancel an in-progress batch
+- GET  /v1/models — list available model IDs
+- GET  /v1/models/{model} — model information
+
+## Models
+
+Compressed by CompactifAI: cai-mistral-small-3-1-slim, hypernova-60b, carina-60b,
+qwen-3-6-27b, cai-whisper-large-v3-turbo-slim.
+Third-party, uncompressed: gpt-oss-120b, mistral-small-3-1, nemotron-3-nano-omni, glm-5-1,
+cai-glm-5-1, glm-5-2, quasar-438b.
+Catalog: https://docs.compactif.ai/models/
+
+## Authentication
+
+`Authorization: Bearer <API key>`. One key per account, issued from
+https://dashboard.compactif.ai/ after billing setup, or via AWS Marketplace subscription
+through Multiverse IAM (manually approved, typically within 24 hours). Rotate from Manage
+API Keys. No OAuth, no scopes. https://docs.compactif.ai/authentication/
+
+## What an agent needs to know before calling
+
+- No idempotency. No Idempotency-Key header exists, and ChatCompletionRequest declares no
+  `seed`. A retried write is executed and billed again. Reconcile with GET /v1/batches or
+  GET /v1/responses/{response_id} rather than blind-retrying.
+- No rate limits are published, no RateLimit-*/Retry-After headers are returned, and 429 is
+  not documented or declared in the spec. There is no runtime signal to back off on.
+- One reversal path exists (cancel a batch) and no window is stated for it. Every inference
+  call is irreversible and metered on receipt.
+- No dry-run, no cost estimate, no tokenizer endpoint. You cannot price a call before
+  making it.
+- Errors use two envelopes: `{"error":{type,message,param,code}}` on documented errors, and
+  a bare `{"detail": ...}` on 401, 404, 422 and 500. `param` and `code` are documented as
+  always null.
+- Every response carries `x-request-id`; you may also supply it on the request. Also
+  returned: `x-served-by-region`, `x-envoy-upstream-service-time`.
+- Model IDs are withdrawn without notice — eleven have been removed since launch, one of
+  them ten weeks after being added. Call GET /v1/models rather than hard-coding.
+- Zero Data Retention: prompts and completions are not stored; anonymized request logs are
+  deleted after 30 days. https://docs.compactif.ai/data-privacy/
+
+## Documentation
+
+- Developer portal: https://docs.compactif.ai/
+- Introduction: https://docs.compactif.ai/introduction/
+- Quickstart: https://docs.compactif.ai/quickstart/
+- API reference: https://docs.compactif.ai/api_reference/
+- Authentication: https://docs.compactif.ai/authentication/
+- OpenAI compatibility: https://docs.compactif.ai/openai-compatibility/
+- Error handling: https://docs.compactif.ai/error-handling/
+- Data privacy: https://docs.compactif.ai/data-privacy/
+- FAQ: https://docs.compactif.ai/faq/
+- Changelog: https://docs.compactif.ai/changelog/
+- Pricing: https://docs.compactif.ai/pricing/
+- Support: https://docs.compactif.ai/support-contact/
+- Status: https://status.compactif.ai/
+- Community (Discord): https://discord.com/invite/KfqDt3En
+
+## Integrations
+
+Configured as an OpenAI-compatible base URL, not as first-party SDKs: Claude Code, Cursor,
+GitHub Copilot, OpenCode, LiteLLM, Hermes Agent, OpenClaw.
+Multiverse Computing publishes no first-party client library on npm, PyPI or any other
+registry, and its GitHub organization (github.com/multiverse-computing) has 0 public repos.
+
+## Not available
+
+No MCP server. No A2A agent card. No GraphQL. No webhooks or AsyncAPI. No gRPC/Protobuf.
+No SOAP/WSDL. No /.well-known document on any host. No Postman collection. No sandbox or
+test-mode keys. No first-party CLI. No published SLA. No public roadmap.
+
+## Company
+
+- Website: https://multiversecomputing.com/
+- Product: https://multiversecomputing.com/compactifai
+- Blog / resources: https://multiversecomputing.com/resources
+- Legal notice (terms of use): https://multiversecomputing.com/legal-notice
+- Privacy policy: https://multiversecomputing.com/privacy-policy
+- AWS Marketplace: https://aws.amazon.com/marketplace/pp/prodview-ce2dp5ibd7lli
+- Other product: Singularity (quantum and quantum-inspired optimization) — no public
+  developer documentation.

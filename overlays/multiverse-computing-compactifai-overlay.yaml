@@ -1,0 +1,102 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for the CompactifAI API
+  version: 1.0.0
+x-provenance:
+  generated: '2026-08-26'
+  method: generated
+  source: openapi/multiverse-computing-compactifai-openapi.yml
+  note: 'Captures API Evangelist enhancements only. It is applied to our copy of the spec
+    for derived artifacts; the provider''s original at
+    openapi/_original/multiverse-computing-compactifai-openapi.json (fetched verbatim from
+    https://api.compactif.ai/openapi.json) is never mutated. Nothing here invents provider
+    behaviour: every action either restates a fact the provider publishes elsewhere or
+    flags a documented gap.'
+extends: openapi/multiverse-computing-compactifai-openapi.yml
+actions:
+- target: $.info
+  description: Name the product and link the human documentation, which the raw spec (title
+    "ChatbotAPI") does not.
+  update:
+    x-product: CompactifAI API
+    x-provider: Multiverse Computing, S.L.
+    x-documentation: https://docs.compactif.ai/
+    x-openai-compatible: true
+    x-openai-compatibility-docs: https://docs.compactif.ai/openai-compatibility/
+- target: $
+  description: 'Add the servers block. The published spec declares no servers[]; the base
+    URL is the host the spec is served from and is documented in every code sample at
+    https://docs.compactif.ai/authentication/. Regional endpoints are documented at
+    https://docs.compactif.ai/faq/.'
+  update:
+    servers:
+    - url: https://api.compactif.ai
+      description: Global endpoint — routed to whichever region is fastest.
+    - url: https://api-eu.compactif.ai
+      description: EU data-residency endpoint.
+    - url: https://api-us.compactif.ai
+      description: US data-residency endpoint.
+- target: $
+  description: 'Apply the declared security scheme globally. The spec defines
+    components.securitySchemes.HTTPBearer but sets no top-level security and no
+    per-operation security, so as published it reads as an anonymous API. A live GET of
+    https://api.compactif.ai/v1/models returns 401.'
+  update:
+    security:
+    - HTTPBearer: []
+- target: $.components.securitySchemes.HTTPBearer
+  description: Document the key issuance and rotation path.
+  update:
+    description: 'Bearer API key. One key per account, issued from the CompactifAI Dashboard
+      (https://dashboard.compactif.ai/) after billing setup, or via AWS Marketplace
+      subscription through Multiverse IAM. Rotate from Manage API Keys. See
+      https://docs.compactif.ai/authentication/.'
+- target: $.paths.*.*.responses
+  description: 'Record the error responses the provider documents at
+    https://docs.compactif.ai/error-handling/ but does not declare in the contract. The
+    spec declares only 200/201/404/422 across all 13 operations.'
+  update:
+    '400':
+      description: 'invalid_request_error — malformed request or invalid parameters
+        (documented, not declared in the source spec).'
+    '401':
+      description: 'authentication_error — no valid API key, or the token is not associated
+        with a valid user (documented, not declared in the source spec).'
+    '500':
+      description: 'server_error — generally temporary; retry (documented, not declared in
+        the source spec).'
+- target: $.paths['/v1/batches/{batch_id}/cancel'].post
+  description: Mark the one reversal operation on this API and record that no reversal
+    window is published.
+  update:
+    x-reversal-of: create_batch_v1_batches_post
+    x-reversibility: documented
+    x-reversal-window: 'unstated — the provider bounds cancellation by job state
+      ("in-progress") and publishes no time window, no billing consequence for
+      already-executed requests, and no maximum duration for the "cancelling" state.'
+- target: $.paths['/v1/chat/completions'].post
+  description: Flag the untyped success response on the API's flagship operation.
+  update:
+    x-response-schema-missing: true
+    x-note: 'The 200 response declares an empty schema ({}). The request is fully typed
+      (ChatCompletionRequest) but code generated from this contract returns an untyped body.
+      The same gap applies to GET /v1/models, GET /v1/models/{model} and
+      POST /v1/audio/transcriptions.'
+- target: $.paths['/v1/models'].get
+  description: Point at the human model catalog, since the response is untyped.
+  update:
+    x-response-schema-missing: true
+    x-catalog: https://docs.compactif.ai/models/
+- target: $.paths['/v1/files'].post
+  description: Record that file upload has no reversal.
+  update:
+    x-reversibility: none
+    x-note: No DELETE /v1/files/{file_id} is published; an uploaded file cannot be removed
+      through the API.
+- target: $.paths.*.*
+  description: 'Record the absence of a rate-limit contract, so a generated client does not
+    silently assume 429 handling. Verified against the docs and a live unauthenticated
+    request.'
+  update:
+    x-rate-limit-documented: false
+    x-idempotency-supported: false

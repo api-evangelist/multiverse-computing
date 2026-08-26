@@ -1,0 +1,39 @@
+generated: '2026-08-26'
+method: generated
+source: 'openapi/multiverse-computing-compactifai-openapi.yml plus the repository artifacts;
+  every operationId referenced was verified against the published spec.'
+provider_published_skills:
+  found: false
+  probed:
+  - url: https://docs.compactif.ai/sitemap-0.xml
+    status: 200
+    finding: 42 documentation URLs, none of them an AGENTS.md, a skill, or an agent
+      instruction file.
+  - url: https://api.compactif.ai/llms.txt
+    status: 404
+  - url: https://docs.compactif.ai/llms.txt
+    status: 403
+skills:
+- name: compactifai-chat-completion
+  file: multiverse-computing-chat-completion.md
+  api: CompactifAI API
+  operations:
+  - get_model_info_list_v1_models_get
+  - get_model_info_v1_models__model__get
+  - chat_completions_v1_chat_completions_post
+- name: compactifai-batch-inference
+  file: multiverse-computing-batch-inference.md
+  api: CompactifAI API
+  operations:
+  - post_files_v1_files_post
+  - create_batch_v1_batches_post
+  - get_batch_v1_batches__batch_id__get
+  - get_batches_v1_batches_get
+  - cancel_batch_v1_batches__batch_id__cancel_post
+  - get_file_content_v1_files__file_id__content_get
+- name: compactifai-audio-transcription
+  file: multiverse-computing-audio-transcription.md
+  api: CompactifAI API
+  operations:
+  - get_model_info_list_v1_models_get
+  - create_transcription_v1_audio_transcriptions_post

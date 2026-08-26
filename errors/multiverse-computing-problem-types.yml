@@ -1,0 +1,122 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.compactif.ai/error-handling/
+derived_from: openapi/multiverse-computing-compactifai-openapi.yml
+docs: https://docs.compactif.ai/error-handling/
+format: custom-json
+rfc9457: false
+content_type: application/json
+envelope:
+  shape: 'A top-level `error` object on documented errors: {"error": {"type", "message",
+    "param", "code"}}'
+  fields:
+  - name: type
+    required: true
+    description: The type of error returned (always present).
+  - name: message
+    required: true
+    description: Human-readable detail.
+  - name: param
+    required: false
+    description: The parameter that caused the error. Documented as "currently always null
+      in our implementation".
+  - name: code
+    required: false
+    description: Machine-readable error code. Documented as "currently always null in our
+      implementation".
+  note: 'This mirrors the OpenAI error envelope, consistent with the API''s OpenAI
+    compatibility posture.'
+secondary_envelope:
+  shape: '{"detail": "<string>"}'
+  where: 'Framework-level responses. Observed live on 401 ("Token is not associated with a
+    valid user") and 404 ("Not Found"), and documented on 500 ("Unexpected server error").
+    The OpenAPI 422 response also uses a `detail` array (HTTPValidationError).'
+  note: 'Two different error envelopes are in play. An agent parsing only `error.type`
+    will get nothing on a 401, a 404 or a 500 — the three cases where it most needs to
+    branch.'
+problem_types:
+- status: 400
+  type: invalid_request_error
+  title: Invalid request
+  detail: The request was malformed or had invalid parameters — invalid model name,
+    missing required fields, or request body validation failure.
+  example_message: 'Invalid request: Model ''nonexistent-model'' not found; available:
+    [model1, model2]'
+  remediation: Correct the request body. For an unknown model, call GET /v1/models and use
+    a published model ID.
+  retryable: false
+  source: https://docs.compactif.ai/error-handling/
+- status: 401
+  type: authentication_error
+  title: Authentication error
+  detail: No valid API key was provided, the token is not in a valid format, or the token
+    is not associated with a valid user.
+  observed_body: '{"detail":"Token is not associated with a valid user"}'
+  remediation: 'Send the header `Authorization: Bearer <API key>`. Rotate the key in the
+    CompactifAI Dashboard if it may be compromised.'
+  retryable: false
+  source: https://docs.compactif.ai/error-handling/
+  probe:
+    url: https://api.compactif.ai/v1/models
+    status: 401
+- status: 404
+  type: not_found_error
+  title: Not found
+  detail: The requested resource does not exist. Returned for path-parameter validation,
+    e.g. GET /v1/models/{invalid-model} and GET /v1/files/{file_id}/content.
+  observed_body: '{"detail":"Not Found"}'
+  remediation: Verify the path identifier. Model IDs come from GET /v1/models.
+  retryable: false
+  source: https://docs.compactif.ai/error-handling/
+  in_spec: true
+  spec_operations:
+  - get_file_content_v1_files__file_id__content_get
+- status: 422
+  type: validation_error
+  title: Validation Error
+  detail: 'FastAPI request-model validation failure. Body is HTTPValidationError:
+    {"detail": [{"loc": [...], "msg": "...", "type": "..."}]}.'
+  remediation: Fix the field named in detail[].loc.
+  retryable: false
+  source: openapi/multiverse-computing-compactifai-openapi.yml
+  in_spec: true
+  spec_operations:
+  - create_transcription_v1_audio_transcriptions_post
+  - create_batch_v1_batches_post
+  - get_batches_v1_batches_get
+  - get_batch_v1_batches__batch_id__get
+  - cancel_batch_v1_batches__batch_id__cancel_post
+  - chat_completions_v1_chat_completions_post
+  - get_file_content_v1_files__file_id__content_get
+  - post_files_v1_files_post
+  - get_model_info_v1_models__model__get
+  - complete_prompt_v1_completions_post
+  - get_response_v1_responses__response_id__get
+  - post_responses_v1_responses_post
+  note: 'Documented nowhere in the error-handling guide — 422 appears only in the OpenAPI,
+    where it is declared on 12 of the 13 operations. The docs describe body-validation
+    failures as 400.'
+- status: 500
+  type: server_error
+  title: Server error
+  detail: Something went wrong on CompactifAI's servers. Documented as generally temporary.
+  observed_body: '{"detail":"Unexpected server error"}'
+  remediation: Retry. Check https://status.compactif.ai/ for a known incident.
+  retryable: true
+  source: https://docs.compactif.ai/error-handling/
+gaps:
+- '429 is not documented and is not declared in the OpenAPI. No Retry-After or
+  RateLimit-* header is returned. An agent cannot distinguish throttling from any other
+  failure.'
+- '`code` and `param` are documented as always null, so the only machine-actionable field
+  in the envelope is `type`, which has 4 documented values.'
+- The docs and the spec disagree about body-validation failures — docs say 400, the
+  OpenAPI declares 422 on 12 operations.
+- No error is documented for the batch, files or responses surfaces beyond the generic
+  422/404.
+correlation:
+  header: x-request-id
+  observed: true
+  note: 'Every response carries a per-request x-request-id (observed on a 401 from
+    https://api.compactif.ai/v1/models). It is not documented in the error guide, but it is
+    the value support will need.'

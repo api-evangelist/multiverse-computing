@@ -1,0 +1,189 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/multiverse-computing-compactifai-openapi.yml
+also_searched:
+- https://docs.compactif.ai/models/
+- https://docs.compactif.ai/api_reference/
+summary:
+  entities: 6
+  relationships: 10
+  note: 'The public data model is small and job-shaped. Of 13 operations only 5 return a
+    named schema; the rest declare an empty 200 body, so the entity graph below is derived
+    from the schemas the contract actually names plus the id-reference fields inside them.'
+entities:
+- name: Model
+  id_field: id
+  id_format: 'Slug, e.g. hypernova-60b, cai-mistral-small-3-1-slim, quasar-438b'
+  operations:
+  - get_model_info_list_v1_models_get
+  - get_model_info_v1_models__model__get
+  schema: null
+  schema_note: 'Both model operations declare an empty 200 schema ({}) in the OpenAPI, so
+    the model object shape is undocumented in the contract. The human catalog at
+    https://docs.compactif.ai/models/ lists 12 model IDs with original architecture.'
+  referenced_by:
+  - ChatCompletionRequest.model
+  - CompletionRequest.model
+  - ResponsesRequest.model
+  - Batch.model
+- name: ChatCompletion
+  id_field: id
+  operations:
+  - chat_completions_v1_chat_completions_post
+  schema: null
+  schema_note: 'POST /v1/chat/completions declares an empty 200 schema. The REQUEST is
+    fully typed (ChatCompletionRequest, 18 properties) but the response is not — the
+    flagship operation of the API has no documented response body.'
+- name: Completion
+  id_field: id
+  operations:
+  - complete_prompt_v1_completions_post
+  schema: CompletionResponse
+  fields:
+  - id
+  - choices
+  - created
+  - model
+  - object
+  - system_fingerprint
+  - usage
+- name: Response
+  id_field: id
+  operations:
+  - post_responses_v1_responses_post
+  - get_response_v1_responses__response_id__get
+  schema: ResponsesResult
+  key_fields:
+  - id
+  - model
+  - status
+  - output
+  - usage
+  - previous_response_id
+  - conversation
+  - metadata
+  - completed_at
+  persistence: 'Only responses created with store:true are retrievable, and only by the
+    user who created them (per the operation description).'
+- name: Batch
+  id_field: id
+  id_prefix: batch_
+  operations:
+  - create_batch_v1_batches_post
+  - get_batches_v1_batches_get
+  - get_batch_v1_batches__batch_id__get
+  - cancel_batch_v1_batches__batch_id__cancel_post
+  schema: Batch
+  key_fields:
+  - id
+  - status
+  - endpoint
+  - completion_window
+  - input_file_id
+  - output_file_id
+  - error_file_id
+  - request_counts
+  - usage
+  - metadata
+  states:
+  - validating
+  - in_progress
+  - finalizing
+  - completed
+  - failed
+  - expired
+  - cancelling
+  - cancelled
+  timestamps:
+  - created_at
+  - in_progress_at
+  - finalizing_at
+  - completed_at
+  - failed_at
+  - expired_at
+  - expires_at
+  - cancelling_at
+  - cancelled_at
+  list_envelope: BatchList {object, data, has_more, first_id, last_id}
+- name: File
+  id_field: id
+  operations:
+  - post_files_v1_files_post
+  - get_file_content_v1_files__file_id__content_get
+  schema: FileObject
+  key_fields:
+  - id
+  - object
+  - bytes
+  - created_at
+  - filename
+  - purpose
+  - owner_id
+  - s3_uri
+  note: 'FileObject.id is documented as the identifier "to use with /v1/responses"; purpose
+    is free text (e.g. user_data, assistants). FileObject exposes an s3_uri (S3Uri schema),
+    leaking the storage backend into the public contract.'
+relationships:
+- from: Batch
+  to: File
+  type: belongs_to
+  via: input_file_id
+  note: The JSONL of requests the batch runs.
+- from: Batch
+  to: File
+  type: has_one
+  via: output_file_id
+  cardinality: 0..1
+- from: Batch
+  to: File
+  type: has_one
+  via: error_file_id
+  cardinality: 0..1
+- from: Batch
+  to: Model
+  type: belongs_to
+  via: model
+- from: BatchList
+  to: Batch
+  type: has_many
+  via: data
+- from: Response
+  to: Model
+  type: belongs_to
+  via: model
+- from: Response
+  to: Response
+  type: belongs_to
+  via: previous_response_id
+  note: Self-referencing conversation chain.
+- from: Response
+  to: File
+  type: belongs_to
+  via: ResponsesRequest.file_id
+  cardinality: 0..1
+- from: ChatCompletion
+  to: Model
+  type: belongs_to
+  via: model
+- from: Completion
+  to: Model
+  type: belongs_to
+  via: model
+usage_accounting:
+  entity: CompletionUsage / BatchUsage / ResponseUsage
+  fields:
+  - prompt_tokens / input_tokens
+  - completion_tokens / output_tokens
+  - total_tokens
+  - PromptTokensDetails
+  - CompletionTokensDetails
+  note: Token counts are the billing unit; see plans/multiverse-computing-plans-pricing.yml.
+gaps:
+- 'No account, organization, API key or usage entity is exposed. Usage and billing moved to
+  the Dashboard when POST /v1/usage/completions was removed on 2026-03-24, so there is no
+  programmatic way to read spend.'
+- 'No DELETE exists for File or Response, so nothing in the model can be removed through
+  the API.'
+- 'Five operations (chat completions, models list, model info, audio transcriptions, file
+  content JSON) declare an empty 200 schema, so a code generator produces untyped
+  responses for the two most-called endpoints in the product.'

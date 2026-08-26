@@ -1,23 +1,130 @@
 aid: multiverse-computing
 name: Multiverse Computing
-description: 'Multiverse Computing is a company surfaced via the API Evangelist harvest backlog (source:
-  secondary-market) and added to the network as a stub for full-pipeline profiling.'
+description: Multiverse Computing, S.L. is a Donostia-San Sebastian (Spain) quantum- and AI-software company
+  whose commercial developer surface is the CompactifAI API — an OpenAI-compatible LLM inference service
+  serving tensor-network-compressed versions of frontier open models (Hypernova 60B, Carina 60B, Mistral
+  Small 3.1 Slim, Whisper Large V3 Turbo Slim) alongside uncompressed third-party models (GPT-OSS 120B,
+  GLM 5.1/5.2, Quasar 438B, Qwen 3.6 27B, Nemotron 3 Nano Omni). The API is published at api.compactif.ai
+  with regional EU and US endpoints, documented at docs.compactif.ai, billed pay-as-you-go per million
+  tokens, and also sold through the AWS Marketplace. The company additionally sells Singularity, a quantum
+  and quantum-inspired optimization product for finance, energy and manufacturing, which has no public
+  developer documentation.
 url: https://raw.githubusercontent.com/api-evangelist/multiverse-computing/refs/heads/main/apis.yml
+image: https://multiversecomputing.com/icon.png
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-26'
 modified: '2026-08-26'
 tags:
+- Artificial Intelligence
+- Machine Learning
+- LLM Inference
+- Model Compression
+- Quantum Computing
+- Speech to Text
+- OpenAI Compatible
+- Developer Tools
+- Spain
 - Company
-apis: []
+apis:
+- aid: multiverse-computing-compactifai-api
+  name: CompactifAI API
+  description: OpenAI-compatible inference API for CompactifAI's compressed and third-party large language
+    models. Covers chat completions, text completions, the Responses API, batch jobs, file upload, model
+    discovery and Whisper audio transcription. Authenticated with a Bearer API key issued from the CompactifAI
+    Dashboard or via AWS Marketplace subscription.
+  humanURL: https://docs.compactif.ai/
+  baseURL: https://api.compactif.ai
+  tags:
+  - LLM Inference
+  - Chat Completions
+  - Speech to Text
+  - Batch
+  - OpenAI Compatible
+  properties:
+  - type: OpenAPI
+    url: openapi/multiverse-computing-compactifai-openapi.yml
+  - type: Documentation
+    url: https://docs.compactif.ai/introduction/
+  - type: APIReference
+    url: https://docs.compactif.ai/api_reference/
+  - type: GettingStarted
+    url: https://docs.compactif.ai/quickstart/
+  - type: Examples
+    url: examples/multiverse-computing-compactifai-examples.yml
+  - type: Overlay
+    url: overlays/multiverse-computing-compactifai-overlay.yaml
+common:
+- type: DomainSecurity
+  url: security/multiverse-computing-domain-security.yml
+- type: Authentication
+  url: authentication/multiverse-computing-authentication.yml
+- type: Website
+  url: https://multiversecomputing.com/
+- type: DeveloperPortal
+  url: https://docs.compactif.ai/
+- type: Documentation
+  url: https://docs.compactif.ai/introduction/
+- type: APIReference
+  url: https://docs.compactif.ai/api_reference/
+- type: GettingStarted
+  url: https://docs.compactif.ai/quickstart/
+- type: Support
+  url: https://docs.compactif.ai/support-contact/
+- type: Community
+  url: https://discord.com/invite/KfqDt3En
+- type: Blog
+  url: https://multiversecomputing.com/resources
+- type: Pricing
+  url: https://docs.compactif.ai/pricing/
+- type: SignUp
+  url: https://auth.multiverseapp.ai/sign-up?redirect_url=https%3A%2F%2Fdashboard.compactif.ai%2F
+- type: Login
+  url: https://dashboard.compactif.ai/
+- type: TermsOfUse
+  url: https://multiversecomputing.com/legal-notice
+- type: PrivacyPolicy
+  url: https://multiversecomputing.com/privacy-policy
+- type: StatusPage
+  url: https://status.compactif.ai/
+- type: Packages
+  url: packages/multiverse-computing-packages.yml
+- type: LLMsTxt
+  url: llms/multiverse-computing-llms.txt
+- type: Overlay
+  url: overlays/multiverse-computing-compactifai-overlay.yaml
+- type: Conformance
+  url: conformance/multiverse-computing-conformance.yml
+- type: ErrorCatalog
+  url: errors/multiverse-computing-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/multiverse-computing-lifecycle.yml
+- type: Conventions
+  url: conventions/multiverse-computing-conventions.yml
+- type: ChangeLog
+  url: changelog/multiverse-computing-changelog.yml
+- type: DataModel
+  url: data-model/multiverse-computing-data-model.yml
+- type: Plans
+  url: plans/multiverse-computing-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/multiverse-computing-rate-limits.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: ReleaseNotes
+  url: https://docs.compactif.ai/changelog/
+- type: Examples
+  url: examples/multiverse-computing-compactifai-examples.yml
+- type: OpenAPI
+  url: openapi/multiverse-computing-compactifai-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
-common:
-- type: Website
-  url: https://forgeglobal.com/multiverse-computing_stock/
+x-enrichment:
+  date: '2026-08-26'
+  status: enriched
+  artifacts_added: 22
+  pass: local-v1
