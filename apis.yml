@@ -28,23 +28,16 @@ tags:
 - Spain
 - Company
 apis:
-- aid: multiverse-computing-compactifai-api
-  name: CompactifAI API
-  description: OpenAI-compatible inference API for CompactifAI's compressed and third-party large language
-    models. Covers chat completions, text completions, the Responses API, batch jobs, file upload, model
-    discovery and Whisper audio transcription. Authenticated with a Bearer API key issued from the CompactifAI
-    Dashboard or via AWS Marketplace subscription.
+- aid: multiverse-computing:multiverse-computing-audio-api
+  name: Multiverse Computing Audio API
+  description: The audio API from Multiverse Computing — 1 operation(s) for audio.
   humanURL: https://docs.compactif.ai/
   baseURL: https://api.compactif.ai
   tags:
-  - LLM Inference
-  - Chat Completions
-  - Speech to Text
-  - Batch
-  - OpenAI Compatible
+  - audio
   properties:
   - type: OpenAPI
-    url: openapi/multiverse-computing-compactifai-openapi.yml
+    url: openapi/multiverse-computing-audio-api-openapi.yml
   - type: Documentation
     url: https://docs.compactif.ai/introduction/
   - type: APIReference
@@ -53,8 +46,96 @@ apis:
     url: https://docs.compactif.ai/quickstart/
   - type: Examples
     url: examples/multiverse-computing-compactifai-examples.yml
-  - type: Overlay
-    url: overlays/multiverse-computing-compactifai-overlay.yaml
+- aid: multiverse-computing:multiverse-computing-batches-api
+  name: Multiverse Computing Batches API
+  description: The batches API from Multiverse Computing — 3 operation(s) for batches.
+  humanURL: https://docs.compactif.ai/
+  baseURL: https://api.compactif.ai
+  tags:
+  - batches
+  properties:
+  - type: OpenAPI
+    url: openapi/multiverse-computing-batches-api-openapi.yml
+  - type: Documentation
+    url: https://docs.compactif.ai/introduction/
+  - type: APIReference
+    url: https://docs.compactif.ai/api_reference/
+  - type: GettingStarted
+    url: https://docs.compactif.ai/quickstart/
+  - type: Examples
+    url: examples/multiverse-computing-compactifai-examples.yml
+- aid: multiverse-computing:multiverse-computing-completions-api
+  name: Multiverse Computing Completions API
+  description: The completions API from Multiverse Computing — 2 operation(s) for completions.
+  humanURL: https://docs.compactif.ai/
+  baseURL: https://api.compactif.ai
+  tags:
+  - completions
+  properties:
+  - type: OpenAPI
+    url: openapi/multiverse-computing-completions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.compactif.ai/introduction/
+  - type: APIReference
+    url: https://docs.compactif.ai/api_reference/
+  - type: GettingStarted
+    url: https://docs.compactif.ai/quickstart/
+  - type: Examples
+    url: examples/multiverse-computing-compactifai-examples.yml
+- aid: multiverse-computing:multiverse-computing-files-api
+  name: Multiverse Computing Files API
+  description: The files API from Multiverse Computing — 2 operation(s) for files.
+  humanURL: https://docs.compactif.ai/
+  baseURL: https://api.compactif.ai
+  tags:
+  - files
+  properties:
+  - type: OpenAPI
+    url: openapi/multiverse-computing-files-api-openapi.yml
+  - type: Documentation
+    url: https://docs.compactif.ai/introduction/
+  - type: APIReference
+    url: https://docs.compactif.ai/api_reference/
+  - type: GettingStarted
+    url: https://docs.compactif.ai/quickstart/
+  - type: Examples
+    url: examples/multiverse-computing-compactifai-examples.yml
+- aid: multiverse-computing:multiverse-computing-model-info-api
+  name: Multiverse Computing Model info API
+  description: The Model info API from Multiverse Computing — 2 operation(s) for model info.
+  humanURL: https://docs.compactif.ai/
+  baseURL: https://api.compactif.ai
+  tags:
+  - Model info
+  properties:
+  - type: OpenAPI
+    url: openapi/multiverse-computing-model-info-api-openapi.yml
+  - type: Documentation
+    url: https://docs.compactif.ai/introduction/
+  - type: APIReference
+    url: https://docs.compactif.ai/api_reference/
+  - type: GettingStarted
+    url: https://docs.compactif.ai/quickstart/
+  - type: Examples
+    url: examples/multiverse-computing-compactifai-examples.yml
+- aid: multiverse-computing:multiverse-computing-responses-api
+  name: Multiverse Computing Responses API
+  description: The responses API from Multiverse Computing — 2 operation(s) for responses.
+  humanURL: https://docs.compactif.ai/
+  baseURL: https://api.compactif.ai
+  tags:
+  - responses
+  properties:
+  - type: OpenAPI
+    url: openapi/multiverse-computing-responses-api-openapi.yml
+  - type: Documentation
+    url: https://docs.compactif.ai/introduction/
+  - type: APIReference
+    url: https://docs.compactif.ai/api_reference/
+  - type: GettingStarted
+    url: https://docs.compactif.ai/quickstart/
+  - type: Examples
+    url: examples/multiverse-computing-compactifai-examples.yml
 common:
 - type: DomainSecurity
   url: security/multiverse-computing-domain-security.yml
