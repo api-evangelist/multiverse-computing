@@ -10,6 +10,18 @@ description: Multiverse Computing, S.L. is a Donostia-San Sebastian (Spain) quan
   and quantum-inspired optimization product for finance, energy and manufacturing, which has no public
   developer documentation.
 url: https://raw.githubusercontent.com/api-evangelist/multiverse-computing/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://multiversecomputing.com/icon.png
 x-type: company
 x-source: harvest:secondary-market
