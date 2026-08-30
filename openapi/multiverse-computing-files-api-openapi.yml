@@ -1,0 +1,254 @@
+openapi: 3.2.0
+info:
+  title: Chatbot Files API
+  description: Chatbot API. Provided by Multiverse Computing.
+  contact:
+    name: Multiverse Computing
+    url: https://multiversecomputing.com/
+    email: contact@multiversecomputing.com
+  version: 0.1.1
+servers:
+- url: https://api.compactif.ai
+  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
+tags:
+- name: files
+paths:
+  /v1/files/{file_id}/content:
+    get:
+      tags:
+      - files
+      summary: Retrieve file content
+      description: Return the raw binary contents of the specified file.
+      operationId: get_file_content_v1_files__file_id__content_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: File Id
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: Raw binary content of the file
+          content:
+            application/json:
+              schema: {}
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/files:
+    post:
+      tags:
+      - files
+      summary: Upload file
+      description: 'The file upload API authenticates with the bearer token and uses app-level
+
+        file store configuration.'
+      operationId: post_files_v1_files_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_post_files_v1_files_post'
+      responses:
+        '200':
+          description: File object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileObject'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    S3Uri:
+      properties:
+        bucket:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bucket
+          description: S3 bucket name.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Object key within the bucket.
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+          description: AWS region.
+        s3_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: S3 Uri
+          description: Full S3 URI (e.g. s3://bucket/...).
+      additionalProperties: true
+      type: object
+      title: S3Uri
+      description: 'S3 location JSONB shape: ``{bucket, key, region, s3_uri}``.'
+    Body_post_files_v1_files_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+          description: Binary file to upload.
+        purpose:
+          type: string
+          title: Purpose
+          description: Purpose of the file (e.g. assistants, batch, user_data).
+      type: object
+      required:
+      - file
+      - purpose
+      title: Body_post_files_v1_files_post
+    FileObject:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: File identifier to use with /v1/responses.
+        object:
+          type: string
+          const: file
+          title: Object
+          description: Object type discriminator.
+          default: file
+        bytes:
+          type: integer
+          title: Bytes
+          description: Size of the file in bytes.
+        created_at:
+          type: integer
+          title: Created At
+          description: Unix timestamp when the file was created.
+        filename:
+          type: string
+          title: Filename
+          description: Original filename.
+        purpose:
+          type: string
+          title: Purpose
+          description: Purpose of the file (e.g. user_data, assistants).
+        owner_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Owner Id
+          description: Application user id that owns this file.
+        s3_uri:
+          anyOf:
+          - $ref: '#/components/schemas/S3Uri'
+          - additionalProperties: true
+            type: object
+          - type: string
+          - type: 'null'
+          title: S3 Uri
+          description: S3 location metadata (bucket, key, region, s3_uri).
+        status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+          description: 'Lifecycle status: pending, uploading, uploaded, error.'
+        ttl:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Ttl
+          description: Unix timestamp for automatic expiration, if set.
+        updated_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Updated At
+          description: Unix timestamp of the last metadata update.
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - bytes
+      - created_at
+      - filename
+      - purpose
+      title: FileObject
+      description: Metadata to an uploaded file (JSON ``file`` object shape).
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

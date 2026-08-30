@@ -1,0 +1,97 @@
+openapi: 3.2.0
+info:
+  title: Chatbot Model info API
+  description: Chatbot API. Provided by Multiverse Computing.
+  contact:
+    name: Multiverse Computing
+    url: https://multiversecomputing.com/
+    email: contact@multiversecomputing.com
+  version: 0.1.1
+servers:
+- url: https://api.compactif.ai
+  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
+tags:
+- name: Model info
+paths:
+  /v1/models/{model}:
+    get:
+      tags:
+      - Model info
+      summary: Get model information
+      operationId: get_model_info_v1_models__model__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: model
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Model
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/models:
+    get:
+      tags:
+      - Model info
+      summary: Get model list
+      operationId: get_model_info_list_v1_models_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - HTTPBearer: []
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

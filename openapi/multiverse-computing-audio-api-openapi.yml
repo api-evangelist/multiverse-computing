@@ -1,0 +1,178 @@
+openapi: 3.2.0
+info:
+  title: Chatbot Audio API
+  description: Chatbot API. Provided by Multiverse Computing.
+  contact:
+    name: Multiverse Computing
+    url: https://multiversecomputing.com/
+    email: contact@multiversecomputing.com
+  version: 0.1.1
+servers:
+- url: https://api.compactif.ai
+  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
+tags:
+- name: audio
+paths:
+  /v1/audio/transcriptions:
+    post:
+      tags:
+      - audio
+      summary: Audio transcriptions endpoint (OpenAI compatible)
+      description: OpenAI-compatible POST `/v1/audio/transcriptions`.
+      operationId: create_transcription_v1_audio_transcriptions_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      - name: x-app-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-App-Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_transcription_v1_audio_transcriptions_post'
+      responses:
+        '200':
+          description: Transcription response in the requested format
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    Body_create_transcription_v1_audio_transcriptions_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+          description: 'Audio file to transcribe. Supported formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, webm. Note: mp4, webm, and m4a files are automatically converted to mp3.'
+        model:
+          type: string
+          title: Model
+          description: Model identifier (e.g., whisper-1)
+        prompt:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prompt
+          description: Optional text to guide the transcription
+        response_format:
+          anyOf:
+          - type: string
+            enum:
+            - json
+            - text
+            - srt
+            - verbose_json
+            - vtt
+          - type: 'null'
+          title: Response Format
+          description: Response format for the transcription. All values are accepted but will default to 'json'.
+          default: json
+        temperature:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Temperature
+          description: Sampling temperature between 0 and 1
+        language:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Language
+          description: Language code hint for the audio (ISO-639-1, e.g. 'en', 'es'). If not provided, the model will auto-detect the language.
+        stream:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stream
+          description: If true, streams server-sent events.
+        include:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Include
+          description: Additional transcription metadata to return (e.g., 'logprobs'). Currently ignored by this service.
+        timestamp_granularities:
+          anyOf:
+          - items:
+              type: string
+              enum:
+              - word
+              - segment
+            type: array
+          - type: 'null'
+          title: Timestamp Granularities
+          description: Timestamp granularity hints (word/segment). Ignored unless verbose JSON is supported.
+        chunking_strategy:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Chunking Strategy
+          description: Controls how audio is chunked (e.g., 'auto' or server_vad object). Ignored by this service.
+      type: object
+      required:
+      - file
+      - model
+      title: Body_create_transcription_v1_audio_transcriptions_post
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

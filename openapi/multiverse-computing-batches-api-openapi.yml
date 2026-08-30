@@ -1,0 +1,582 @@
+openapi: 3.2.0
+info:
+  title: Chatbot Batches API
+  description: Chatbot API. Provided by Multiverse Computing.
+  contact:
+    name: Multiverse Computing
+    url: https://multiversecomputing.com/
+    email: contact@multiversecomputing.com
+  version: 0.1.1
+servers:
+- url: https://api.compactif.ai
+  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
+tags:
+- name: batches
+paths:
+  /v1/batches:
+    post:
+      tags:
+      - batches
+      summary: Create a batch
+      description: 'Create a new batch inference job.
+
+
+        Accepts OpenAI ``BatchCreateParams`` (input file id, endpoint, completion_window).
+
+        Publishes the job to the file store for async processing and returns a Batch
+
+        object with status ``validating``.
+
+
+        Parameters:
+
+        - **app_config**: Application configuration.
+
+        - **batch_request**: Batch creation parameters (``input_file_id``, ``endpoint``, ``completion_window``).
+
+        - **authorization**: Bearer token for authentication.
+
+
+        Returns:
+
+        - A Batch object with status ''validating''.'
+      operationId: create_batch_v1_batches_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchCreateParams'
+      responses:
+        '201':
+          description: The created batch object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - batches
+      summary: List batches
+      description: 'List batch jobs (OpenAI-compatible: ``GET /v1/batches`` with ``after``, ``limit``, and list envelope).
+
+
+        Each entry is hydrated like ``GET /batches/{{batch_id}}`` (live status from file meta).'
+      operationId: get_batches_v1_batches_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: after
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 'A cursor for pagination: the object id after which to fetch the next page. Use the previous response''s last_id to page forward.'
+          title: After
+        description: 'A cursor for pagination: the object id after which to fetch the next page. Use the previous response''s last_id to page forward.'
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Maximum number of items to return (1–100, default 20).
+          default: 20
+          title: Limit
+        description: Maximum number of items to return (1–100, default 20).
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: Paginated-style list of batch objects (OpenAI-compatible shape)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchList'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/batches/{batch_id}:
+    get:
+      tags:
+      - batches
+      summary: Retrieve a batch
+      description: 'Return the batch job state by loading the batch JSON stored at creation time.
+
+
+        Parameters:
+
+        - **batch_id**: Identifier returned by ``POST /batches`` (e.g. ``batch_…``).
+
+        - **app_config**: Application configuration.
+
+        - **authorization**: Bearer token for authentication.
+
+
+        Returns:
+
+        - The persisted :class:`Batch` object (same shape as create), including ``status``.'
+      operationId: get_batch_v1_batches__batch_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Batch Id
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: The batch object including current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/batches/{batch_id}/cancel:
+    post:
+      tags:
+      - batches
+      summary: Cancel a batch
+      description: 'Request cancellation of an in-progress batch (OpenAI-compatible shape).
+
+
+        Matches ``POST /v1/batches/{batch_id}/cancel``: returns the updated :class:`Batch`,
+
+        usually with ``status`` ``cancelling`` and ``cancelling_at`` set.
+
+
+        Parameters:
+
+        - **batch_id**: Batch identifier (e.g. ``batch_…``).
+
+        - **authorization**: Bearer token for authentication.
+
+
+        Returns:
+
+        - The updated batch object.'
+      operationId: cancel_batch_v1_batches__batch_id__cancel_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Batch Id
+      - name: x-request-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Request-Id
+      responses:
+        '200':
+          description: The batch object after requesting cancellation (typically status cancelling)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    BatchList:
+      properties:
+        object:
+          type: string
+          const: list
+          title: Object
+          description: Object type; always 'list' for a paginated collection.
+          default: list
+        data:
+          items:
+            $ref: '#/components/schemas/Batch'
+          type: array
+          title: Data
+          description: The page of items, in id-cursor order.
+        has_more:
+          type: boolean
+          title: Has More
+          description: Whether more items exist after this page.
+        first_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Id
+          description: Id of the first item in data, or null when the page is empty.
+        last_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Id
+          description: Id of the last item in data, or null when the page is empty. Pass this back as 'after' to fetch the next page.
+      type: object
+      required:
+      - data
+      - has_more
+      title: BatchList
+      description: 'List batches response — matches https://platform.openai.com/docs/api-reference/batch/list.
+
+
+        Uses the shared :class:`~api.src.api_models.pagination.CursorPage` envelope so
+
+        the pagination shape stays consistent across list endpoints.'
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Batch:
+      properties:
+        id:
+          type: string
+          title: Id
+        completion_window:
+          type: string
+          title: Completion Window
+        created_at:
+          type: integer
+          title: Created At
+        endpoint:
+          type: string
+          title: Endpoint
+        input_file_id:
+          type: string
+          title: Input File Id
+        object:
+          type: string
+          const: batch
+          title: Object
+        status:
+          type: string
+          enum:
+          - validating
+          - failed
+          - in_progress
+          - finalizing
+          - completed
+          - expired
+          - cancelling
+          - cancelled
+          title: Status
+        cancelled_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cancelled At
+        cancelling_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cancelling At
+        completed_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Completed At
+        error_file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error File Id
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Errors'
+          - type: 'null'
+        expired_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expired At
+        expires_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expires At
+        failed_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Failed At
+        finalizing_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Finalizing At
+        in_progress_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: In Progress At
+        metadata:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Metadata
+        model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Model
+        output_file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Output File Id
+        request_counts:
+          anyOf:
+          - $ref: '#/components/schemas/BatchRequestCounts'
+          - type: 'null'
+        usage:
+          anyOf:
+          - $ref: '#/components/schemas/BatchUsage'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - completion_window
+      - created_at
+      - endpoint
+      - input_file_id
+      - object
+      - status
+      title: Batch
+    BatchCreateParams:
+      properties:
+        completion_window:
+          type: string
+          const: 24h
+          title: Completion Window
+        endpoint:
+          type: string
+          enum:
+          - /v1/responses
+          - /v1/chat/completions
+          - /v1/embeddings
+          - /v1/completions
+          title: Endpoint
+        input_file_id:
+          type: string
+          title: Input File Id
+        metadata:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Metadata
+        output_expires_after:
+          $ref: '#/components/schemas/OutputExpiresAfter'
+      type: object
+      required:
+      - completion_window
+      - endpoint
+      - input_file_id
+      title: BatchCreateParams
+    OutputTokensDetails:
+      properties:
+        reasoning_tokens:
+          type: integer
+          title: Reasoning Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - reasoning_tokens
+      title: OutputTokensDetails
+    InputTokensDetails:
+      properties:
+        cached_tokens:
+          type: integer
+          title: Cached Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - cached_tokens
+      title: InputTokensDetails
+    BatchUsage:
+      properties:
+        input_tokens:
+          type: integer
+          title: Input Tokens
+        input_tokens_details:
+          $ref: '#/components/schemas/InputTokensDetails'
+        output_tokens:
+          type: integer
+          title: Output Tokens
+        output_tokens_details:
+          $ref: '#/components/schemas/OutputTokensDetails'
+        total_tokens:
+          type: integer
+          title: Total Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - input_tokens
+      - input_tokens_details
+      - output_tokens
+      - output_tokens_details
+      - total_tokens
+      title: BatchUsage
+    BatchError:
+      properties:
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        line:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Line
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        param:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Param
+      additionalProperties: true
+      type: object
+      title: BatchError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    BatchRequestCounts:
+      properties:
+        completed:
+          type: integer
+          title: Completed
+        failed:
+          type: integer
+          title: Failed
+        total:
+          type: integer
+          title: Total
+      additionalProperties: true
+      type: object
+      required:
+      - completed
+      - failed
+      - total
+      title: BatchRequestCounts
+    Errors:
+      properties:
+        data:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/BatchError'
+            type: array
+          - type: 'null'
+          title: Data
+        object:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Object
+      additionalProperties: true
+      type: object
+      title: Errors
+    OutputExpiresAfter:
+      properties:
+        anchor:
+          type: string
+          const: created_at
+          title: Anchor
+        seconds:
+          type: integer
+          title: Seconds
+      type: object
+      required:
+      - anchor
+      - seconds
+      title: OutputExpiresAfter
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
