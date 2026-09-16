@@ -42,7 +42,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.20'
 created: '2026-08-26'
-modified: '2026-08-26'
+modified: '2026-09-16'
 tags:
 - Artificial Intelligence
 - Machine-Learning
@@ -246,7 +246,7 @@ common:
 - type: Examples
   url: examples/multiverse-computing-compactifai-examples.yml
 - type: OpenAPI
-  url: openapi/multiverse-computing-compactifai-openapi.yml
+  url: openapi/_original/multiverse-computing-compactifai-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
