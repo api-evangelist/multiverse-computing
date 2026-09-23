@@ -7,16 +7,13 @@ info:
     url: https://multiversecomputing.com/
     email: contact@multiversecomputing.com
   version: 0.1.1
-servers:
-- url: https://api.compactif.ai
-  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
 tags:
-- name: batches
+- name: Batches
 paths:
   /v1/batches:
     post:
       tags:
-      - batches
+      - Batches
       summary: Create a batch
       description: 'Create a new batch inference job.
 
@@ -73,7 +70,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
     get:
       tags:
-      - batches
+      - Batches
       summary: List batches
       description: 'List batch jobs (OpenAI-compatible: ``GET /v1/batches`` with ``after``, ``limit``, and list envelope).
 
@@ -128,7 +125,7 @@ paths:
   /v1/batches/{batch_id}:
     get:
       tags:
-      - batches
+      - Batches
       summary: Retrieve a batch
       description: 'Return the batch job state by loading the batch JSON stored at creation time.
 
@@ -179,7 +176,7 @@ paths:
   /v1/batches/{batch_id}/cancel:
     post:
       tags:
-      - batches
+      - Batches
       summary: Cancel a batch
       description: 'Request cancellation of an in-progress batch (OpenAI-compatible shape).
 
@@ -232,6 +229,92 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    BatchCreateParams:
+      properties:
+        completion_window:
+          type: string
+          const: 24h
+          title: Completion Window
+        endpoint:
+          type: string
+          enum:
+          - /v1/responses
+          - /v1/chat/completions
+          - /v1/embeddings
+          - /v1/completions
+          title: Endpoint
+        input_file_id:
+          type: string
+          title: Input File Id
+        metadata:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Metadata
+        output_expires_after:
+          $ref: '#/components/schemas/OutputExpiresAfter'
+      type: object
+      required:
+      - completion_window
+      - endpoint
+      - input_file_id
+      title: BatchCreateParams
+    InputTokensDetails:
+      properties:
+        cached_tokens:
+          type: integer
+          title: Cached Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - cached_tokens
+      title: InputTokensDetails
+    BatchRequestCounts:
+      properties:
+        completed:
+          type: integer
+          title: Completed
+        failed:
+          type: integer
+          title: Failed
+        total:
+          type: integer
+          title: Total
+      additionalProperties: true
+      type: object
+      required:
+      - completed
+      - failed
+      - total
+      title: BatchRequestCounts
     BatchList:
       properties:
         object:
@@ -273,6 +356,20 @@ components:
         Uses the shared :class:`~api.src.api_models.pagination.CursorPage` envelope so
 
         the pagination shape stays consistent across list endpoints.'
+    OutputExpiresAfter:
+      properties:
+        anchor:
+          type: string
+          const: created_at
+          title: Anchor
+        seconds:
+          type: integer
+          title: Seconds
+      type: object
+      required:
+      - anchor
+      - seconds
+      title: OutputExpiresAfter
     HTTPValidationError:
       properties:
         detail:
@@ -282,6 +379,48 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    BatchError:
+      properties:
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        line:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Line
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        param:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Param
+      additionalProperties: true
+      type: object
+      title: BatchError
+    Errors:
+      properties:
+        data:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/BatchError'
+            type: array
+          - type: 'null'
+          title: Data
+        object:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Object
+      additionalProperties: true
+      type: object
+      title: Errors
     Batch:
       properties:
         id:
@@ -400,58 +539,6 @@ components:
       - object
       - status
       title: Batch
-    BatchCreateParams:
-      properties:
-        completion_window:
-          type: string
-          const: 24h
-          title: Completion Window
-        endpoint:
-          type: string
-          enum:
-          - /v1/responses
-          - /v1/chat/completions
-          - /v1/embeddings
-          - /v1/completions
-          title: Endpoint
-        input_file_id:
-          type: string
-          title: Input File Id
-        metadata:
-          anyOf:
-          - additionalProperties:
-              type: string
-            type: object
-          - type: 'null'
-          title: Metadata
-        output_expires_after:
-          $ref: '#/components/schemas/OutputExpiresAfter'
-      type: object
-      required:
-      - completion_window
-      - endpoint
-      - input_file_id
-      title: BatchCreateParams
-    OutputTokensDetails:
-      properties:
-        reasoning_tokens:
-          type: integer
-          title: Reasoning Tokens
-      additionalProperties: true
-      type: object
-      required:
-      - reasoning_tokens
-      title: OutputTokensDetails
-    InputTokensDetails:
-      properties:
-        cached_tokens:
-          type: integer
-          title: Cached Tokens
-      additionalProperties: true
-      type: object
-      required:
-      - cached_tokens
-      title: InputTokensDetails
     BatchUsage:
       properties:
         input_tokens:
@@ -476,106 +563,16 @@ components:
       - output_tokens_details
       - total_tokens
       title: BatchUsage
-    BatchError:
+    OutputTokensDetails:
       properties:
-        code:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Code
-        line:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Line
-        message:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Message
-        param:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Param
-      additionalProperties: true
-      type: object
-      title: BatchError
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    BatchRequestCounts:
-      properties:
-        completed:
+        reasoning_tokens:
           type: integer
-          title: Completed
-        failed:
-          type: integer
-          title: Failed
-        total:
-          type: integer
-          title: Total
+          title: Reasoning Tokens
       additionalProperties: true
       type: object
       required:
-      - completed
-      - failed
-      - total
-      title: BatchRequestCounts
-    Errors:
-      properties:
-        data:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/BatchError'
-            type: array
-          - type: 'null'
-          title: Data
-        object:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Object
-      additionalProperties: true
-      type: object
-      title: Errors
-    OutputExpiresAfter:
-      properties:
-        anchor:
-          type: string
-          const: created_at
-          title: Anchor
-        seconds:
-          type: integer
-          title: Seconds
-      type: object
-      required:
-      - anchor
-      - seconds
-      title: OutputExpiresAfter
+      - reasoning_tokens
+      title: OutputTokensDetails
   securitySchemes:
     HTTPBearer:
       type: http

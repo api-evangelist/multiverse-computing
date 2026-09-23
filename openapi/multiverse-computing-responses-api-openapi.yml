@@ -7,16 +7,13 @@ info:
     url: https://multiversecomputing.com/
     email: contact@multiversecomputing.com
   version: 0.1.1
-servers:
-- url: https://api.compactif.ai
-  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
 tags:
-- name: responses
+- name: Responses
 paths:
   /v1/responses/{response_id}:
     get:
       tags:
-      - responses
+      - Responses
       summary: Retrieve response
       description: 'Return a previously stored response, scoped to the authenticated user.
 
@@ -58,7 +55,7 @@ paths:
   /v1/responses:
     post:
       tags:
-      - responses
+      - Responses
       summary: Create response
       description: 'Generate a response from the model.
 
@@ -118,533 +115,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    ActionScreenshot:
-      properties:
-        type:
-          type: string
-          const: screenshot
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ActionScreenshot
-    CodeInterpreterContainerCodeInterpreterToolAuto:
-      properties:
-        type:
-          type: string
-          const: auto
-          title: Type
-        file_ids:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: File Ids
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: CodeInterpreterContainerCodeInterpreterToolAuto
-    LocalShellCallAction:
-      properties:
-        command:
-          items:
-            type: string
-          type: array
-          title: Command
-        env:
-          additionalProperties:
-            type: string
-          type: object
-          title: Env
-        type:
-          type: string
-          const: exec
-          title: Type
-        timeout_ms:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Timeout Ms
-        user:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: User
-        working_directory:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Working Directory
-      additionalProperties: true
-      type: object
-      required:
-      - command
-      - env
-      - type
-      title: LocalShellCallAction
-    ResponseFormatText:
-      properties:
-        type:
-          type: string
-          const: text
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ResponseFormatText
-    PendingSafetyCheck:
-      properties:
-        id:
-          type: string
-          title: Id
-        code:
-          type: string
-          title: Code
-        message:
-          type: string
-          title: Message
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - code
-      - message
-      title: PendingSafetyCheck
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    ResponseFormatJSONObject:
-      properties:
-        type:
-          type: string
-          const: json_object
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ResponseFormatJSONObject
-    Message:
-      properties:
-        content:
-          items:
-            anyOf:
-            - $ref: '#/components/schemas/ResponseInputText'
-            - $ref: '#/components/schemas/ResponseInputImage'
-            - $ref: '#/components/schemas/ResponseInputFile'
-            - $ref: '#/components/schemas/ResponseInputAudio'
-          type: array
-          title: Content
-        role:
-          type: string
-          enum:
-          - user
-          - system
-          - developer
-          title: Role
-        status:
-          anyOf:
-          - type: string
-            enum:
-            - in_progress
-            - completed
-            - incomplete
-          - type: 'null'
-          title: Status
-        type:
-          anyOf:
-          - type: string
-            const: message
-          - type: 'null'
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - content
-      - role
-      title: Message
-    ResponseInputImageContent:
-      properties:
-        type:
-          type: string
-          const: input_image
-          title: Type
-        detail:
-          anyOf:
-          - type: string
-            enum:
-            - low
-            - high
-            - auto
-          - type: 'null'
-          title: Detail
-        file_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Id
-        image_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Image Url
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ResponseInputImageContent
-    FileSearchTool:
-      properties:
-        type:
-          type: string
-          const: file_search
-          title: Type
-        vector_store_ids:
-          items:
-            type: string
-          type: array
-          title: Vector Store Ids
-        filters:
-          anyOf:
-          - $ref: '#/components/schemas/ComparisonFilter'
-          - $ref: '#/components/schemas/CompoundFilter'
-          - type: 'null'
-          title: Filters
-        max_num_results:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Max Num Results
-        ranking_options:
-          anyOf:
-          - $ref: '#/components/schemas/RankingOptions'
-          - type: 'null'
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      - vector_store_ids
-      title: FileSearchTool
-    Reasoning:
-      properties:
-        effort:
-          anyOf:
-          - type: string
-            enum:
-            - minimal
-            - low
-            - medium
-            - high
-          - type: 'null'
-          title: Effort
-        generate_summary:
-          anyOf:
-          - type: string
-            enum:
-            - auto
-            - concise
-            - detailed
-          - type: 'null'
-          title: Generate Summary
-        summary:
-          anyOf:
-          - type: string
-            enum:
-            - auto
-            - concise
-            - detailed
-          - type: 'null'
-          title: Summary
-      additionalProperties: true
-      type: object
-      title: Reasoning
-    LocalShellCallOutput:
-      properties:
-        id:
-          type: string
-          title: Id
-        output:
-          type: string
-          title: Output
-        type:
-          type: string
-          const: local_shell_call_output
-          title: Type
-        status:
-          anyOf:
-          - type: string
-            enum:
-            - in_progress
-            - completed
-            - incomplete
-          - type: 'null'
-          title: Status
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - output
-      - type
-      title: LocalShellCallOutput
-    McpApprovalRequest:
-      properties:
-        id:
-          type: string
-          title: Id
-        arguments:
-          type: string
-          title: Arguments
-        name:
-          type: string
-          title: Name
-        server_label:
-          type: string
-          title: Server Label
-        type:
-          type: string
-          const: mcp_approval_request
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - arguments
-      - name
-      - server_label
-      - type
-      title: McpApprovalRequest
-    RankingOptions:
-      properties:
-        ranker:
-          anyOf:
-          - type: string
-            enum:
-            - auto
-            - default-2024-11-15
-          - type: 'null'
-          title: Ranker
-        score_threshold:
-          anyOf:
-          - type: number
-          - type: 'null'
-          title: Score Threshold
-      additionalProperties: true
-      type: object
-      title: RankingOptions
-    McpCall:
-      properties:
-        id:
-          type: string
-          title: Id
-        arguments:
-          type: string
-          title: Arguments
-        name:
-          type: string
-          title: Name
-        server_label:
-          type: string
-          title: Server Label
-        type:
-          type: string
-          const: mcp_call
-          title: Type
-        approval_request_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Approval Request Id
-        error:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Error
-        output:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Output
-        status:
-          anyOf:
-          - type: string
-            enum:
-            - in_progress
-            - completed
-            - incomplete
-            - calling
-            - failed
-          - type: 'null'
-          title: Status
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - arguments
-      - name
-      - server_label
-      - type
-      title: McpCall
-    ImageGenerationCall:
-      properties:
-        id:
-          type: string
-          title: Id
-        result:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Result
-        status:
-          type: string
-          enum:
-          - in_progress
-          - completed
-          - generating
-          - failed
-          title: Status
-        type:
-          type: string
-          const: image_generation_call
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - status
-      - type
-      title: ImageGenerationCall
-    McpRequireApprovalMcpToolApprovalFilterNever:
-      properties:
-        read_only:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Read Only
-        tool_names:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: Tool Names
-      additionalProperties: true
-      type: object
-      title: McpRequireApprovalMcpToolApprovalFilterNever
-    EasyInputMessage:
-      properties:
-        content:
-          anyOf:
-          - type: string
-          - items:
-              anyOf:
-              - $ref: '#/components/schemas/ResponseInputText'
-              - $ref: '#/components/schemas/ResponseInputImage'
-              - $ref: '#/components/schemas/ResponseInputFile'
-              - $ref: '#/components/schemas/ResponseInputAudio'
-            type: array
-          title: Content
-        role:
-          type: string
-          enum:
-          - user
-          - assistant
-          - system
-          - developer
-          title: Role
-        type:
-          anyOf:
-          - type: string
-            const: message
-          - type: 'null'
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - content
-      - role
-      title: EasyInputMessage
-    ActionFind:
-      properties:
-        pattern:
-          type: string
-          title: Pattern
-        type:
-          type: string
-          const: find
-          title: Type
-        url:
-          type: string
-          title: Url
-      additionalProperties: true
-      type: object
-      required:
-      - pattern
-      - type
-      - url
-      title: ActionFind
-    ActionScroll:
-      properties:
-        scroll_x:
-          type: integer
-          title: Scroll X
-        scroll_y:
-          type: integer
-          title: Scroll Y
-        type:
-          type: string
-          const: scroll
-          title: Type
-        x:
-          type: integer
-          title: X
-        y:
-          type: integer
-          title: Y
-      additionalProperties: true
-      type: object
-      required:
-      - scroll_x
-      - scroll_y
-      - type
-      - x
-      - y
-      title: ActionScroll
     ResponseCustomToolCall:
       properties:
         call_id:
@@ -673,6 +143,192 @@ components:
       - name
       - type
       title: ResponseCustomToolCall
+    ComputerCallOutputAcknowledgedSafetyCheck:
+      properties:
+        id:
+          type: string
+          title: Id
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: ComputerCallOutputAcknowledgedSafetyCheck
+    AnnotationContainerFileCitation:
+      properties:
+        container_id:
+          type: string
+          title: Container Id
+        end_index:
+          type: integer
+          title: End Index
+        file_id:
+          type: string
+          title: File Id
+        filename:
+          type: string
+          title: Filename
+        start_index:
+          type: integer
+          title: Start Index
+        type:
+          type: string
+          const: container_file_citation
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - container_id
+      - end_index
+      - file_id
+      - filename
+      - start_index
+      - type
+      title: AnnotationContainerFileCitation
+    ResponseReasoningItem:
+      properties:
+        id:
+          type: string
+          title: Id
+        summary:
+          items:
+            $ref: '#/components/schemas/Summary'
+          type: array
+          title: Summary
+        type:
+          type: string
+          const: reasoning
+          title: Type
+        content:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Content'
+            type: array
+          - type: 'null'
+          title: Content
+        encrypted_content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Encrypted Content
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - summary
+      - type
+      title: ResponseReasoningItem
+    LocalShellCallOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+        output:
+          type: string
+          title: Output
+        type:
+          type: string
+          const: local_shell_call_output
+          title: Type
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - output
+      - type
+      title: LocalShellCallOutput
+    ResponseFunctionWebSearch:
+      properties:
+        id:
+          type: string
+          title: Id
+        action:
+          anyOf:
+          - $ref: '#/components/schemas/ActionSearch'
+          - $ref: '#/components/schemas/ActionOpenPage'
+          - $ref: '#/components/schemas/ActionFind'
+          title: Action
+        status:
+          type: string
+          enum:
+          - in_progress
+          - searching
+          - completed
+          - failed
+          title: Status
+        type:
+          type: string
+          const: web_search_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - action
+      - status
+      - type
+      title: ResponseFunctionWebSearch
+    ActionMove:
+      properties:
+        type:
+          type: string
+          const: move
+          title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - x
+      - y
+      title: ActionMove
+    ActionSearchSource:
+      properties:
+        type:
+          type: string
+          const: url
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - url
+      title: ActionSearchSource
     ResponseFunctionToolCall:
       properties:
         arguments:
@@ -710,100 +366,35 @@ components:
       - name
       - type
       title: ResponseFunctionToolCall
-    ActionClick:
+    ImageGenerationCall:
       properties:
-        button:
+        id:
           type: string
-          enum:
-          - left
-          - right
-          - wheel
-          - back
-          - forward
-          title: Button
-        type:
-          type: string
-          const: click
-          title: Type
-        x:
-          type: integer
-          title: X
-        y:
-          type: integer
-          title: Y
-      additionalProperties: true
-      type: object
-      required:
-      - button
-      - type
-      - x
-      - y
-      title: ActionClick
-    McpRequireApprovalMcpToolApprovalFilter:
-      properties:
-        always:
-          anyOf:
-          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilterAlways'
-          - type: 'null'
-        never:
-          anyOf:
-          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilterNever'
-          - type: 'null'
-      additionalProperties: true
-      type: object
-      title: McpRequireApprovalMcpToolApprovalFilter
-    ResponseUsage:
-      properties:
-        input_tokens:
-          type: integer
-          title: Input Tokens
-        input_tokens_details:
-          $ref: '#/components/schemas/InputTokensDetails'
-        output_tokens:
-          type: integer
-          title: Output Tokens
-        output_tokens_details:
-          $ref: '#/components/schemas/OutputTokensDetails'
-        total_tokens:
-          type: integer
-          title: Total Tokens
-      additionalProperties: true
-      type: object
-      required:
-      - input_tokens
-      - input_tokens_details
-      - output_tokens
-      - output_tokens_details
-      - total_tokens
-      title: ResponseUsage
-    ComparisonFilter:
-      properties:
-        key:
-          type: string
-          title: Key
-        type:
-          type: string
-          enum:
-          - eq
-          - ne
-          - gt
-          - gte
-          - lt
-          - lte
-          title: Type
-        value:
+          title: Id
+        result:
           anyOf:
           - type: string
-          - type: number
-          - type: boolean
-          title: Value
+          - type: 'null'
+          title: Result
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - generating
+          - failed
+          title: Status
+        type:
+          type: string
+          const: image_generation_call
+          title: Type
       additionalProperties: true
       type: object
       required:
-      - key
+      - id
+      - status
       - type
-      - value
-      title: ComparisonFilter
+      title: ImageGenerationCall
     ResponseCodeInterpreterToolCall:
       properties:
         id:
@@ -847,37 +438,152 @@ components:
       - status
       - type
       title: ResponseCodeInterpreterToolCall
-    ResponseFunctionWebSearch:
+    McpRequireApprovalMcpToolApprovalFilterNever:
       properties:
-        id:
-          type: string
-          title: Id
-        action:
+        read_only:
           anyOf:
-          - $ref: '#/components/schemas/ActionSearch'
-          - $ref: '#/components/schemas/ActionOpenPage'
-          - $ref: '#/components/schemas/ActionFind'
-          title: Action
-        status:
-          type: string
-          enum:
-          - in_progress
-          - searching
-          - completed
-          - failed
-          title: Status
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+        tool_names:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tool Names
+      additionalProperties: true
+      type: object
+      title: McpRequireApprovalMcpToolApprovalFilterNever
+    ActionDoubleClick:
+      properties:
         type:
           type: string
-          const: web_search_call
+          const: double_click
           title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
       additionalProperties: true
       type: object
       required:
-      - id
-      - action
-      - status
       - type
-      title: ResponseFunctionWebSearch
+      - x
+      - y
+      title: ActionDoubleClick
+    ActionFind:
+      properties:
+        pattern:
+          type: string
+          title: Pattern
+        type:
+          type: string
+          const: find
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - pattern
+      - type
+      - url
+      title: ActionFind
+    ResponseFormatTextJSONSchemaConfig:
+      properties:
+        name:
+          type: string
+          title: Name
+        schema:
+          additionalProperties: true
+          type: object
+          title: Schema
+        type:
+          type: string
+          const: json_schema
+          title: Type
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        strict:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Strict
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - schema
+      - type
+      title: ResponseFormatTextJSONSchemaConfig
+    ResponseInputImage:
+      properties:
+        detail:
+          type: string
+          enum:
+          - low
+          - high
+          - auto
+          title: Detail
+        type:
+          type: string
+          const: input_image
+          title: Type
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        image_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Url
+      additionalProperties: true
+      type: object
+      required:
+      - detail
+      - type
+      title: ResponseInputImage
+    FileSearchTool:
+      properties:
+        type:
+          type: string
+          const: file_search
+          title: Type
+        vector_store_ids:
+          items:
+            type: string
+          type: array
+          title: Vector Store Ids
+        filters:
+          anyOf:
+          - $ref: '#/components/schemas/ComparisonFilter'
+          - $ref: '#/components/schemas/CompoundFilter'
+          - type: 'null'
+          title: Filters
+        max_num_results:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Num Results
+        ranking_options:
+          anyOf:
+          - $ref: '#/components/schemas/RankingOptions'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - vector_store_ids
+      title: FileSearchTool
     ResponsesRequest:
       properties:
         model:
@@ -935,356 +641,29 @@ components:
         text:
           format:
             type: text
-    CompoundFilter:
-      properties:
-        filters:
-          items:
-            anyOf:
-            - $ref: '#/components/schemas/ComparisonFilter'
-            - {}
-          type: array
-          title: Filters
-        type:
-          type: string
-          enum:
-          - and
-          - or
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - filters
-      - type
-      title: CompoundFilter
-    ResponseComputerToolCall:
-      properties:
-        id:
-          type: string
-          title: Id
-        action:
-          anyOf:
-          - $ref: '#/components/schemas/ActionClick'
-          - $ref: '#/components/schemas/ActionDoubleClick'
-          - $ref: '#/components/schemas/ActionDrag'
-          - $ref: '#/components/schemas/ActionKeypress'
-          - $ref: '#/components/schemas/ActionMove'
-          - $ref: '#/components/schemas/ActionScreenshot'
-          - $ref: '#/components/schemas/ActionScroll'
-          - $ref: '#/components/schemas/ActionType'
-          - $ref: '#/components/schemas/ActionWait'
-          title: Action
-        call_id:
-          type: string
-          title: Call Id
-        pending_safety_checks:
-          items:
-            $ref: '#/components/schemas/PendingSafetyCheck'
-          type: array
-          title: Pending Safety Checks
-        status:
-          type: string
-          enum:
-          - in_progress
-          - completed
-          - incomplete
-          title: Status
-        type:
-          type: string
-          const: computer_call
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - action
-      - call_id
-      - pending_safety_checks
-      - status
-      - type
-      title: ResponseComputerToolCall
-    ImageGenerationInputImageMask:
-      properties:
-        file_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Id
-        image_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Image Url
-      additionalProperties: true
-      type: object
-      title: ImageGenerationInputImageMask
-    ComputerTool:
-      properties:
-        display_height:
-          type: integer
-          title: Display Height
-        display_width:
-          type: integer
-          title: Display Width
-        environment:
-          type: string
-          enum:
-          - windows
-          - mac
-          - linux
-          - ubuntu
-          - browser
-          title: Environment
-        type:
-          type: string
-          const: computer_use_preview
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - display_height
-      - display_width
-      - environment
-      - type
-      title: ComputerTool
-    InputTokensDetails:
-      properties:
-        cached_tokens:
-          type: integer
-          title: Cached Tokens
-      additionalProperties: true
-      type: object
-      required:
-      - cached_tokens
-      title: InputTokensDetails
-    Content:
-      properties:
-        text:
-          type: string
-          title: Text
-        type:
-          type: string
-          const: reasoning_text
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - text
-      - type
-      title: Content
-    ToolChoiceTypes:
-      properties:
-        type:
-          type: string
-          enum:
-          - file_search
-          - web_search_preview
-          - computer_use_preview
-          - web_search_preview_2025_03_11
-          - image_generation
-          - code_interpreter
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ToolChoiceTypes
-    FunctionTool-Output:
-      properties:
-        name:
-          type: string
-          title: Name
-        parameters:
-          anyOf:
-          - additionalProperties: true
-            type: object
-          - type: 'null'
-          title: Parameters
-        strict:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Strict
-        type:
-          type: string
-          const: function
-          title: Type
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      additionalProperties: true
-      type: object
-      required:
-      - name
-      - type
-      title: FunctionTool
-    ResponseComputerToolCallOutputScreenshot:
-      properties:
-        type:
-          type: string
-          const: computer_screenshot
-          title: Type
-        file_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Id
-        image_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Image Url
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ResponseComputerToolCallOutputScreenshot
-    Summary:
-      properties:
-        text:
-          type: string
-          title: Text
-        type:
-          type: string
-          const: summary_text
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - text
-      - type
-      title: Summary
-    ResponseTextConfig:
-      properties:
-        format:
-          anyOf:
-          - $ref: '#/components/schemas/ResponseFormatText'
-          - $ref: '#/components/schemas/ResponseFormatTextJSONSchemaConfig'
-          - $ref: '#/components/schemas/ResponseFormatJSONObject'
-          - type: 'null'
-          title: Format
-        verbosity:
-          anyOf:
-          - type: string
-            enum:
-            - low
-            - medium
-            - high
-          - type: 'null'
-          title: Verbosity
-      additionalProperties: true
-      type: object
-      title: ResponseTextConfig
-    McpListToolsTool:
-      properties:
-        input_schema:
-          title: Input Schema
-        name:
-          type: string
-          title: Name
-        annotations:
-          anyOf:
-          - {}
-          - type: 'null'
-          title: Annotations
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      additionalProperties: true
-      type: object
-      required:
-      - input_schema
-      - name
-      title: McpListToolsTool
-    McpRequireApprovalMcpToolApprovalFilterAlways:
-      properties:
-        read_only:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Read Only
-        tool_names:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: Tool Names
-      additionalProperties: true
-      type: object
-      title: McpRequireApprovalMcpToolApprovalFilterAlways
-    ResponseOutputRefusal:
-      properties:
-        refusal:
-          type: string
-          title: Refusal
-        type:
-          type: string
-          const: refusal
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - refusal
-      - type
-      title: ResponseOutputRefusal
-    LocalShellCall:
-      properties:
-        id:
-          type: string
-          title: Id
-        action:
-          $ref: '#/components/schemas/LocalShellCallAction'
-        call_id:
-          type: string
-          title: Call Id
-        status:
-          type: string
-          enum:
-          - in_progress
-          - completed
-          - incomplete
-          title: Status
-        type:
-          type: string
-          const: local_shell_call
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - action
-      - call_id
-      - status
-      - type
-      title: LocalShellCall
-    FunctionCallOutput:
+    ComputerCallOutput:
       properties:
         call_id:
           type: string
           title: Call Id
         output:
-          anyOf:
-          - type: string
-          - items:
-              anyOf:
-              - $ref: '#/components/schemas/ResponseInputTextContent'
-              - $ref: '#/components/schemas/ResponseInputImageContent'
-              - $ref: '#/components/schemas/ResponseInputFileContent'
-            type: array
-          title: Output
+          $ref: '#/components/schemas/ResponseComputerToolCallOutputScreenshot'
         type:
           type: string
-          const: function_call_output
+          const: computer_call_output
           title: Type
         id:
           anyOf:
           - type: string
           - type: 'null'
           title: Id
+        acknowledged_safety_checks:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ComputerCallOutputAcknowledgedSafetyCheck'
+            type: array
+          - type: 'null'
+          title: Acknowledged Safety Checks
         status:
           anyOf:
           - type: string
@@ -1300,38 +679,7 @@ components:
       - call_id
       - output
       - type
-      title: FunctionCallOutput
-    ResponseInputFile:
-      properties:
-        type:
-          type: string
-          const: input_file
-          title: Type
-        file_data:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Data
-        file_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Id
-        file_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Url
-        filename:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Filename
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ResponseInputFile
+      title: ComputerCallOutput
     ToolChoiceAllowed:
       properties:
         mode:
@@ -1357,261 +705,17 @@ components:
       - tools
       - type
       title: ToolChoiceAllowed
-    OutputLogs:
+    OutputTokensDetails:
       properties:
-        logs:
-          type: string
-          title: Logs
-        type:
-          type: string
-          const: logs
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - logs
-      - type
-      title: OutputLogs
-    ResponseFormatTextJSONSchemaConfig:
-      properties:
-        name:
-          type: string
-          title: Name
-        schema:
-          additionalProperties: true
-          type: object
-          title: Schema
-        type:
-          type: string
-          const: json_schema
-          title: Type
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        strict:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Strict
-      additionalProperties: true
-      type: object
-      required:
-      - name
-      - schema
-      - type
-      title: ResponseFormatTextJSONSchemaConfig
-    LogprobTopLogprob:
-      properties:
-        token:
-          type: string
-          title: Token
-        bytes:
-          items:
-            type: integer
-          type: array
-          title: Bytes
-        logprob:
-          type: number
-          title: Logprob
-      additionalProperties: true
-      type: object
-      required:
-      - token
-      - bytes
-      - logprob
-      title: LogprobTopLogprob
-    ActionSearch:
-      properties:
-        query:
-          type: string
-          title: Query
-        type:
-          type: string
-          const: search
-          title: Type
-        sources:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/ActionSearchSource'
-            type: array
-          - type: 'null'
-          title: Sources
-      additionalProperties: true
-      type: object
-      required:
-      - query
-      - type
-      title: ActionSearch
-    OutputImage:
-      properties:
-        type:
-          type: string
-          const: image
-          title: Type
-        url:
-          type: string
-          title: Url
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      - url
-      title: OutputImage
-    ComputerCallOutputAcknowledgedSafetyCheck:
-      properties:
-        id:
-          type: string
-          title: Id
-        code:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Code
-        message:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Message
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      title: ComputerCallOutputAcknowledgedSafetyCheck
-    ActionWait:
-      properties:
-        type:
-          type: string
-          const: wait
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ActionWait
-    IncompleteDetails:
-      properties:
-        reason:
-          anyOf:
-          - type: string
-            enum:
-            - max_output_tokens
-            - content_filter
-          - type: 'null'
-          title: Reason
-      additionalProperties: true
-      type: object
-      title: IncompleteDetails
-    CustomTool:
-      properties:
-        name:
-          type: string
-          title: Name
-        type:
-          type: string
-          const: custom
-          title: Type
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        format:
-          anyOf:
-          - $ref: '#/components/schemas/Text'
-          - $ref: '#/components/schemas/Grammar'
-          - type: 'null'
-          title: Format
-      additionalProperties: true
-      type: object
-      required:
-      - name
-      - type
-      title: CustomTool
-    ActionMove:
-      properties:
-        type:
-          type: string
-          const: move
-          title: Type
-        x:
+        reasoning_tokens:
           type: integer
-          title: X
-        y:
-          type: integer
-          title: Y
+          title: Reasoning Tokens
       additionalProperties: true
       type: object
       required:
-      - type
-      - x
-      - y
-      title: ActionMove
-    AnnotationFilePath:
-      properties:
-        file_id:
-          type: string
-          title: File Id
-        index:
-          type: integer
-          title: Index
-        type:
-          type: string
-          const: file_path
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - file_id
-      - index
-      - type
-      title: AnnotationFilePath
-    Filters:
-      properties:
-        allowed_domains:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: Allowed Domains
-      additionalProperties: true
-      type: object
-      title: Filters
-    ResponseOutputText:
-      properties:
-        annotations:
-          items:
-            anyOf:
-            - $ref: '#/components/schemas/AnnotationFileCitation'
-            - $ref: '#/components/schemas/AnnotationURLCitation'
-            - $ref: '#/components/schemas/AnnotationContainerFileCitation'
-            - $ref: '#/components/schemas/AnnotationFilePath'
-          type: array
-          title: Annotations
-        text:
-          type: string
-          title: Text
-        type:
-          type: string
-          const: output_text
-          title: Type
-        logprobs:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/Logprob'
-            type: array
-          - type: 'null'
-          title: Logprobs
-      additionalProperties: true
-      type: object
-      required:
-      - annotations
-      - text
-      - type
-      title: ResponseOutputText
-    Mcp:
+      - reasoning_tokens
+      title: OutputTokensDetails
+    ToolChoiceMcp:
       properties:
         server_label:
           type: string
@@ -1620,111 +724,17 @@ components:
           type: string
           const: mcp
           title: Type
-        allowed_tools:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - $ref: '#/components/schemas/McpAllowedToolsMcpToolFilter'
-          - type: 'null'
-          title: Allowed Tools
-        authorization:
+        name:
           anyOf:
           - type: string
           - type: 'null'
-          title: Authorization
-        connector_id:
-          anyOf:
-          - type: string
-            enum:
-            - connector_dropbox
-            - connector_gmail
-            - connector_googlecalendar
-            - connector_googledrive
-            - connector_microsoftteams
-            - connector_outlookcalendar
-            - connector_outlookemail
-            - connector_sharepoint
-          - type: 'null'
-          title: Connector Id
-        headers:
-          anyOf:
-          - additionalProperties:
-              type: string
-            type: object
-          - type: 'null'
-          title: Headers
-        require_approval:
-          anyOf:
-          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilter'
-          - type: string
-            enum:
-            - always
-            - never
-          - type: 'null'
-          title: Require Approval
-        server_description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Server Description
-        server_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Server Url
+          title: Name
       additionalProperties: true
       type: object
       required:
       - server_label
       - type
-      title: Mcp
-    McpApprovalResponse:
-      properties:
-        approval_request_id:
-          type: string
-          title: Approval Request Id
-        approve:
-          type: boolean
-          title: Approve
-        type:
-          type: string
-          const: mcp_approval_response
-          title: Type
-        id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Id
-        reason:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Reason
-      additionalProperties: true
-      type: object
-      required:
-      - approval_request_id
-      - approve
-      - type
-      title: McpApprovalResponse
-    McpAllowedToolsMcpToolFilter:
-      properties:
-        read_only:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Read Only
-        tool_names:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: Tool Names
-      additionalProperties: true
-      type: object
-      title: McpAllowedToolsMcpToolFilter
+      title: ToolChoiceMcp
     ResponsesResult:
       properties:
         id:
@@ -2054,362 +1064,34 @@ components:
           input_tokens: 12
           output_tokens: 3
           total_tokens: 15
-    ToolChoiceCustom:
+    McpApprovalRequest:
       properties:
+        id:
+          type: string
+          title: Id
+        arguments:
+          type: string
+          title: Arguments
         name:
           type: string
           title: Name
-        type:
-          type: string
-          const: custom
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - name
-      - type
-      title: ToolChoiceCustom
-    ResponseCustomToolCallOutput:
-      properties:
-        call_id:
-          type: string
-          title: Call Id
-        output:
-          anyOf:
-          - type: string
-          - items:
-              anyOf:
-              - $ref: '#/components/schemas/ResponseInputText'
-              - $ref: '#/components/schemas/ResponseInputImage'
-              - $ref: '#/components/schemas/ResponseInputFile'
-            type: array
-          title: Output
-        type:
-          type: string
-          const: custom_tool_call_output
-          title: Type
-        id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Id
-      additionalProperties: true
-      type: object
-      required:
-      - call_id
-      - output
-      - type
-      title: ResponseCustomToolCallOutput
-    Grammar:
-      properties:
-        definition:
-          type: string
-          title: Definition
-        syntax:
-          type: string
-          enum:
-          - lark
-          - regex
-          title: Syntax
-        type:
-          type: string
-          const: grammar
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - definition
-      - syntax
-      - type
-      title: Grammar
-    WebSearchTool:
-      properties:
-        type:
-          type: string
-          enum:
-          - web_search
-          - web_search_2025_08_26
-          title: Type
-        filters:
-          anyOf:
-          - $ref: '#/components/schemas/Filters'
-          - type: 'null'
-        search_context_size:
-          anyOf:
-          - type: string
-            enum:
-            - low
-            - medium
-            - high
-          - type: 'null'
-          title: Search Context Size
-        user_location:
-          anyOf:
-          - $ref: '#/components/schemas/openai__types__responses__web_search_tool__UserLocation'
-          - type: 'null'
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: WebSearchTool
-    ResponseInputFileContent:
-      properties:
-        type:
-          type: string
-          const: input_file
-          title: Type
-        file_data:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Data
-        file_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Id
-        file_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: File Url
-        filename:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Filename
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: ResponseInputFileContent
-    ResponseInputTextContent:
-      properties:
-        text:
-          type: string
-          title: Text
-        type:
-          type: string
-          const: input_text
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - text
-      - type
-      title: ResponseInputTextContent
-    ActionDragPath:
-      properties:
-        x:
-          type: integer
-          title: X
-        y:
-          type: integer
-          title: Y
-      additionalProperties: true
-      type: object
-      required:
-      - x
-      - y
-      title: ActionDragPath
-    ResponsePrompt:
-      properties:
-        id:
-          type: string
-          title: Id
-        variables:
-          anyOf:
-          - additionalProperties:
-              anyOf:
-              - type: string
-              - $ref: '#/components/schemas/ResponseInputText'
-              - $ref: '#/components/schemas/ResponseInputImage'
-              - $ref: '#/components/schemas/ResponseInputFile'
-            type: object
-          - type: 'null'
-          title: Variables
-        version:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Version
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      title: ResponsePrompt
-    Logprob:
-      properties:
-        token:
-          type: string
-          title: Token
-        bytes:
-          items:
-            type: integer
-          type: array
-          title: Bytes
-        logprob:
-          type: number
-          title: Logprob
-        top_logprobs:
-          items:
-            $ref: '#/components/schemas/LogprobTopLogprob'
-          type: array
-          title: Top Logprobs
-      additionalProperties: true
-      type: object
-      required:
-      - token
-      - bytes
-      - logprob
-      - top_logprobs
-      title: Logprob
-    ResponseInputText:
-      properties:
-        text:
-          type: string
-          title: Text
-        type:
-          type: string
-          const: input_text
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - text
-      - type
-      title: ResponseInputText
-    ItemReference:
-      properties:
-        id:
-          type: string
-          title: Id
-        type:
-          anyOf:
-          - type: string
-            const: item_reference
-          - type: 'null'
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      title: ItemReference
-    WebSearchPreviewTool:
-      properties:
-        type:
-          type: string
-          enum:
-          - web_search_preview
-          - web_search_preview_2025_03_11
-          title: Type
-        search_context_size:
-          anyOf:
-          - type: string
-            enum:
-            - low
-            - medium
-            - high
-          - type: 'null'
-          title: Search Context Size
-        user_location:
-          anyOf:
-          - $ref: '#/components/schemas/openai__types__responses__web_search_preview_tool__UserLocation'
-          - type: 'null'
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: WebSearchPreviewTool
-    McpListTools:
-      properties:
-        id:
-          type: string
-          title: Id
         server_label:
           type: string
           title: Server Label
-        tools:
-          items:
-            $ref: '#/components/schemas/McpListToolsTool'
-          type: array
-          title: Tools
         type:
           type: string
-          const: mcp_list_tools
-          title: Type
-        error:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Error
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - server_label
-      - tools
-      - type
-      title: McpListTools
-    ResponseError:
-      properties:
-        code:
-          type: string
-          enum:
-          - server_error
-          - rate_limit_exceeded
-          - invalid_prompt
-          - vector_store_timeout
-          - invalid_image
-          - invalid_image_format
-          - invalid_base64_image
-          - invalid_image_url
-          - image_too_large
-          - image_too_small
-          - image_parse_error
-          - image_content_policy_violation
-          - invalid_image_mode
-          - image_file_too_large
-          - unsupported_image_media_type
-          - empty_image_file
-          - failed_to_download_image
-          - image_file_not_found
-          title: Code
-        message:
-          type: string
-          title: Message
-      additionalProperties: true
-      type: object
-      required:
-      - code
-      - message
-      title: ResponseError
-    Conversation:
-      properties:
-        id:
-          type: string
-          title: Id
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      title: Conversation
-    ToolChoiceFunction-Output:
-      properties:
-        name:
-          type: string
-          title: Name
-        type:
-          type: string
-          const: function
+          const: mcp_approval_request
           title: Type
       additionalProperties: true
       type: object
       required:
+      - id
+      - arguments
       - name
+      - server_label
       - type
-      title: ToolChoiceFunction
-    Text:
+      title: McpApprovalRequest
+    ResponseFormatText:
       properties:
         type:
           type: string
@@ -2419,149 +1101,7 @@ components:
       type: object
       required:
       - type
-      title: Text
-    ActionType:
-      properties:
-        text:
-          type: string
-          title: Text
-        type:
-          type: string
-          const: type
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - text
-      - type
-      title: ActionType
-    openai__types__responses__web_search_preview_tool__UserLocation:
-      properties:
-        type:
-          type: string
-          const: approximate
-          title: Type
-        city:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: City
-        country:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Country
-        region:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Region
-        timezone:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Timezone
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      title: UserLocation
-    AnnotationFileCitation:
-      properties:
-        file_id:
-          type: string
-          title: File Id
-        filename:
-          type: string
-          title: Filename
-        index:
-          type: integer
-          title: Index
-        type:
-          type: string
-          const: file_citation
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - file_id
-      - filename
-      - index
-      - type
-      title: AnnotationFileCitation
-    ActionKeypress:
-      properties:
-        keys:
-          items:
-            type: string
-          type: array
-          title: Keys
-        type:
-          type: string
-          const: keypress
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - keys
-      - type
-      title: ActionKeypress
-    CodeInterpreter:
-      properties:
-        container:
-          anyOf:
-          - type: string
-          - $ref: '#/components/schemas/CodeInterpreterContainerCodeInterpreterToolAuto'
-          title: Container
-        type:
-          type: string
-          const: code_interpreter
-          title: Type
-      additionalProperties: true
-      type: object
-      required:
-      - container
-      - type
-      title: CodeInterpreter
-    ComputerCallOutput:
-      properties:
-        call_id:
-          type: string
-          title: Call Id
-        output:
-          $ref: '#/components/schemas/ResponseComputerToolCallOutputScreenshot'
-        type:
-          type: string
-          const: computer_call_output
-          title: Type
-        id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Id
-        acknowledged_safety_checks:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/ComputerCallOutputAcknowledgedSafetyCheck'
-            type: array
-          - type: 'null'
-          title: Acknowledged Safety Checks
-        status:
-          anyOf:
-          - type: string
-            enum:
-            - in_progress
-            - completed
-            - incomplete
-          - type: 'null'
-          title: Status
-      additionalProperties: true
-      type: object
-      required:
-      - call_id
-      - output
-      - type
-      title: ComputerCallOutput
+      title: ResponseFormatText
     ImageGeneration:
       properties:
         type:
@@ -2647,6 +1187,453 @@ components:
       required:
       - type
       title: ImageGeneration
+    ToolChoiceTypes:
+      properties:
+        type:
+          type: string
+          enum:
+          - file_search
+          - web_search_preview
+          - computer_use_preview
+          - web_search_preview_2025_03_11
+          - image_generation
+          - code_interpreter
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ToolChoiceTypes
+    Summary:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: summary_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: Summary
+    CompoundFilter:
+      properties:
+        filters:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ComparisonFilter'
+            - {}
+          type: array
+          title: Filters
+        type:
+          type: string
+          enum:
+          - and
+          - or
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - filters
+      - type
+      title: CompoundFilter
+    openai__types__responses__web_search_preview_tool__UserLocation:
+      properties:
+        type:
+          type: string
+          const: approximate
+          title: Type
+        city:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: City
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+        timezone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Timezone
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: UserLocation
+    LocalShellCallAction:
+      properties:
+        command:
+          items:
+            type: string
+          type: array
+          title: Command
+        env:
+          additionalProperties:
+            type: string
+          type: object
+          title: Env
+        type:
+          type: string
+          const: exec
+          title: Type
+        timeout_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Timeout Ms
+        user:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User
+        working_directory:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Working Directory
+      additionalProperties: true
+      type: object
+      required:
+      - command
+      - env
+      - type
+      title: LocalShellCallAction
+    openai__types__responses__web_search_tool__UserLocation:
+      properties:
+        city:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: City
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+        timezone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Timezone
+        type:
+          anyOf:
+          - type: string
+            const: approximate
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      title: UserLocation
+    OutputImage:
+      properties:
+        type:
+          type: string
+          const: image
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - url
+      title: OutputImage
+    ResponseInputFile:
+      properties:
+        type:
+          type: string
+          const: input_file
+          title: Type
+        file_data:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Data
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        file_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Url
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseInputFile
+    Filters:
+      properties:
+        allowed_domains:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Allowed Domains
+      additionalProperties: true
+      type: object
+      title: Filters
+    IncompleteDetails:
+      properties:
+        reason:
+          anyOf:
+          - type: string
+            enum:
+            - max_output_tokens
+            - content_filter
+          - type: 'null'
+          title: Reason
+      additionalProperties: true
+      type: object
+      title: IncompleteDetails
+    AnnotationURLCitation:
+      properties:
+        end_index:
+          type: integer
+          title: End Index
+        start_index:
+          type: integer
+          title: Start Index
+        title:
+          type: string
+          title: Title
+        type:
+          type: string
+          const: url_citation
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - end_index
+      - start_index
+      - title
+      - type
+      - url
+      title: AnnotationURLCitation
+    PendingSafetyCheck:
+      properties:
+        id:
+          type: string
+          title: Id
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - code
+      - message
+      title: PendingSafetyCheck
+    ResponseUsage:
+      properties:
+        input_tokens:
+          type: integer
+          title: Input Tokens
+        input_tokens_details:
+          $ref: '#/components/schemas/InputTokensDetails'
+        output_tokens:
+          type: integer
+          title: Output Tokens
+        output_tokens_details:
+          $ref: '#/components/schemas/OutputTokensDetails'
+        total_tokens:
+          type: integer
+          title: Total Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - input_tokens
+      - input_tokens_details
+      - output_tokens
+      - output_tokens_details
+      - total_tokens
+      title: ResponseUsage
+    ResponseTextConfig:
+      properties:
+        format:
+          anyOf:
+          - $ref: '#/components/schemas/ResponseFormatText'
+          - $ref: '#/components/schemas/ResponseFormatTextJSONSchemaConfig'
+          - $ref: '#/components/schemas/ResponseFormatJSONObject'
+          - type: 'null'
+          title: Format
+        verbosity:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Verbosity
+      additionalProperties: true
+      type: object
+      title: ResponseTextConfig
+    LocalShell:
+      properties:
+        type:
+          type: string
+          const: local_shell
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: LocalShell
+    ActionOpenPage:
+      properties:
+        type:
+          type: string
+          const: open_page
+          title: Type
+        url:
+          type: string
+          title: Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      - url
+      title: ActionOpenPage
+    WebSearchPreviewTool:
+      properties:
+        type:
+          type: string
+          enum:
+          - web_search_preview
+          - web_search_preview_2025_03_11
+          title: Type
+        search_context_size:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Search Context Size
+        user_location:
+          anyOf:
+          - $ref: '#/components/schemas/openai__types__responses__web_search_preview_tool__UserLocation'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: WebSearchPreviewTool
+    ActionSearch:
+      properties:
+        query:
+          type: string
+          title: Query
+        type:
+          type: string
+          const: search
+          title: Type
+        sources:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ActionSearchSource'
+            type: array
+          - type: 'null'
+          title: Sources
+      additionalProperties: true
+      type: object
+      required:
+      - query
+      - type
+      title: ActionSearch
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    EasyInputMessage:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ResponseInputText'
+              - $ref: '#/components/schemas/ResponseInputImage'
+              - $ref: '#/components/schemas/ResponseInputFile'
+              - $ref: '#/components/schemas/ResponseInputAudio'
+            type: array
+          title: Content
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          - system
+          - developer
+          title: Role
+        type:
+          anyOf:
+          - type: string
+            const: message
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - content
+      - role
+      title: EasyInputMessage
     ResponseFileSearchToolCall:
       properties:
         id:
@@ -2685,84 +1672,207 @@ components:
       - status
       - type
       title: ResponseFileSearchToolCall
-    ActionDrag:
+    McpListToolsTool:
       properties:
-        path:
-          items:
-            $ref: '#/components/schemas/ActionDragPath'
-          type: array
-          title: Path
+        input_schema:
+          title: Input Schema
+        name:
+          type: string
+          title: Name
+        annotations:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Annotations
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      additionalProperties: true
+      type: object
+      required:
+      - input_schema
+      - name
+      title: McpListToolsTool
+    ResponseInputImageContent:
+      properties:
         type:
           type: string
-          const: drag
+          const: input_image
+          title: Type
+        detail:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - high
+            - auto
+          - type: 'null'
+          title: Detail
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        image_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Url
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseInputImageContent
+    ResponseOutputRefusal:
+      properties:
+        refusal:
+          type: string
+          title: Refusal
+        type:
+          type: string
+          const: refusal
           title: Type
       additionalProperties: true
       type: object
       required:
-      - path
+      - refusal
       - type
-      title: ActionDrag
-    AnnotationContainerFileCitation:
+      title: ResponseOutputRefusal
+    CodeInterpreter:
       properties:
-        container_id:
+        container:
+          anyOf:
+          - type: string
+          - $ref: '#/components/schemas/CodeInterpreterContainerCodeInterpreterToolAuto'
+          title: Container
+        type:
           type: string
-          title: Container Id
-        end_index:
-          type: integer
-          title: End Index
+          const: code_interpreter
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - container
+      - type
+      title: CodeInterpreter
+    ResponseOutputText:
+      properties:
+        annotations:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/AnnotationFileCitation'
+            - $ref: '#/components/schemas/AnnotationURLCitation'
+            - $ref: '#/components/schemas/AnnotationContainerFileCitation'
+            - $ref: '#/components/schemas/AnnotationFilePath'
+          type: array
+          title: Annotations
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: output_text
+          title: Type
+        logprobs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Logprob'
+            type: array
+          - type: 'null'
+          title: Logprobs
+      additionalProperties: true
+      type: object
+      required:
+      - annotations
+      - text
+      - type
+      title: ResponseOutputText
+    FunctionCallOutput:
+      properties:
+        call_id:
+          type: string
+          title: Call Id
+        output:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ResponseInputTextContent'
+              - $ref: '#/components/schemas/ResponseInputImageContent'
+              - $ref: '#/components/schemas/ResponseInputFileContent'
+            type: array
+          title: Output
+        type:
+          type: string
+          const: function_call_output
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - call_id
+      - output
+      - type
+      title: FunctionCallOutput
+    AnnotationFileCitation:
+      properties:
         file_id:
           type: string
           title: File Id
         filename:
           type: string
           title: Filename
-        start_index:
+        index:
           type: integer
-          title: Start Index
+          title: Index
         type:
           type: string
-          const: container_file_citation
+          const: file_citation
           title: Type
       additionalProperties: true
       type: object
       required:
-      - container_id
-      - end_index
       - file_id
       - filename
-      - start_index
+      - index
       - type
-      title: AnnotationContainerFileCitation
-    ActionOpenPage:
+      title: AnnotationFileCitation
+    ResponseComputerToolCallOutputScreenshot:
       properties:
         type:
           type: string
-          const: open_page
+          const: computer_screenshot
           title: Type
-        url:
-          type: string
-          title: Url
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        image_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Url
       additionalProperties: true
       type: object
       required:
       - type
-      - url
-      title: ActionOpenPage
-    ActionSearchSource:
-      properties:
-        type:
-          type: string
-          const: url
-          title: Type
-        url:
-          type: string
-          title: Url
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      - url
-      title: ActionSearchSource
+      title: ResponseComputerToolCallOutputScreenshot
     InputAudio-Output:
       properties:
         data:
@@ -2780,68 +1890,21 @@ components:
       - data
       - format
       title: InputAudio
-    ResponseReasoningItem:
+    ToolChoiceCustom:
       properties:
-        id:
-          type: string
-          title: Id
-        summary:
-          items:
-            $ref: '#/components/schemas/Summary'
-          type: array
-          title: Summary
-        type:
-          type: string
-          const: reasoning
-          title: Type
-        content:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/Content'
-            type: array
-          - type: 'null'
-          title: Content
-        encrypted_content:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Encrypted Content
-        status:
-          anyOf:
-          - type: string
-            enum:
-            - in_progress
-            - completed
-            - incomplete
-          - type: 'null'
-          title: Status
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - summary
-      - type
-      title: ResponseReasoningItem
-    ToolChoiceMcp:
-      properties:
-        server_label:
-          type: string
-          title: Server Label
-        type:
-          type: string
-          const: mcp
-          title: Type
         name:
-          anyOf:
-          - type: string
-          - type: 'null'
+          type: string
           title: Name
+        type:
+          type: string
+          const: custom
+          title: Type
       additionalProperties: true
       type: object
       required:
-      - server_label
+      - name
       - type
-      title: ToolChoiceMcp
+      title: ToolChoiceCustom
     Result:
       properties:
         attributes:
@@ -2877,6 +1940,311 @@ components:
       additionalProperties: true
       type: object
       title: Result
+    ActionType:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: type
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: ActionType
+    ResponseComputerToolCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        action:
+          anyOf:
+          - $ref: '#/components/schemas/ActionClick'
+          - $ref: '#/components/schemas/ActionDoubleClick'
+          - $ref: '#/components/schemas/ActionDrag'
+          - $ref: '#/components/schemas/ActionKeypress'
+          - $ref: '#/components/schemas/ActionMove'
+          - $ref: '#/components/schemas/ActionScreenshot'
+          - $ref: '#/components/schemas/ActionScroll'
+          - $ref: '#/components/schemas/ActionType'
+          - $ref: '#/components/schemas/ActionWait'
+          title: Action
+        call_id:
+          type: string
+          title: Call Id
+        pending_safety_checks:
+          items:
+            $ref: '#/components/schemas/PendingSafetyCheck'
+          type: array
+          title: Pending Safety Checks
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - incomplete
+          title: Status
+        type:
+          type: string
+          const: computer_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - action
+      - call_id
+      - pending_safety_checks
+      - status
+      - type
+      title: ResponseComputerToolCall
+    Content:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: reasoning_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: Content
+    McpRequireApprovalMcpToolApprovalFilter:
+      properties:
+        always:
+          anyOf:
+          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilterAlways'
+          - type: 'null'
+        never:
+          anyOf:
+          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilterNever'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      title: McpRequireApprovalMcpToolApprovalFilter
+    ItemReference:
+      properties:
+        id:
+          type: string
+          title: Id
+        type:
+          anyOf:
+          - type: string
+            const: item_reference
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: ItemReference
+    Mcp:
+      properties:
+        server_label:
+          type: string
+          title: Server Label
+        type:
+          type: string
+          const: mcp
+          title: Type
+        allowed_tools:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - $ref: '#/components/schemas/McpAllowedToolsMcpToolFilter'
+          - type: 'null'
+          title: Allowed Tools
+        authorization:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+        connector_id:
+          anyOf:
+          - type: string
+            enum:
+            - connector_dropbox
+            - connector_gmail
+            - connector_googlecalendar
+            - connector_googledrive
+            - connector_microsoftteams
+            - connector_outlookcalendar
+            - connector_outlookemail
+            - connector_sharepoint
+          - type: 'null'
+          title: Connector Id
+        headers:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Headers
+        require_approval:
+          anyOf:
+          - $ref: '#/components/schemas/McpRequireApprovalMcpToolApprovalFilter'
+          - type: string
+            enum:
+            - always
+            - never
+          - type: 'null'
+          title: Require Approval
+        server_description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Server Description
+        server_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Server Url
+      additionalProperties: true
+      type: object
+      required:
+      - server_label
+      - type
+      title: Mcp
+    ActionKeypress:
+      properties:
+        keys:
+          items:
+            type: string
+          type: array
+          title: Keys
+        type:
+          type: string
+          const: keypress
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - keys
+      - type
+      title: ActionKeypress
+    McpRequireApprovalMcpToolApprovalFilterAlways:
+      properties:
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+        tool_names:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tool Names
+      additionalProperties: true
+      type: object
+      title: McpRequireApprovalMcpToolApprovalFilterAlways
+    ResponseInputText:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: input_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: ResponseInputText
+    Conversation:
+      properties:
+        id:
+          type: string
+          title: Id
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: Conversation
+    ResponseCustomToolCallOutput:
+      properties:
+        call_id:
+          type: string
+          title: Call Id
+        output:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ResponseInputText'
+              - $ref: '#/components/schemas/ResponseInputImage'
+              - $ref: '#/components/schemas/ResponseInputFile'
+            type: array
+          title: Output
+        type:
+          type: string
+          const: custom_tool_call_output
+          title: Type
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+      additionalProperties: true
+      type: object
+      required:
+      - call_id
+      - output
+      - type
+      title: ResponseCustomToolCallOutput
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ResponseError:
+      properties:
+        code:
+          type: string
+          enum:
+          - server_error
+          - rate_limit_exceeded
+          - invalid_prompt
+          - vector_store_timeout
+          - invalid_image
+          - invalid_image_format
+          - invalid_base64_image
+          - invalid_image_url
+          - image_too_large
+          - image_too_small
+          - image_parse_error
+          - image_content_policy_violation
+          - invalid_image_mode
+          - image_file_too_large
+          - unsupported_image_media_type
+          - empty_image_file
+          - failed_to_download_image
+          - image_file_not_found
+          title: Code
+        message:
+          type: string
+          title: Message
+      additionalProperties: true
+      type: object
+      required:
+      - code
+      - message
+      title: ResponseError
     ResponseOutputMessage:
       properties:
         id:
@@ -2913,6 +2281,209 @@ components:
       - status
       - type
       title: ResponseOutputMessage
+    ActionWait:
+      properties:
+        type:
+          type: string
+          const: wait
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ActionWait
+    ActionScroll:
+      properties:
+        scroll_x:
+          type: integer
+          title: Scroll X
+        scroll_y:
+          type: integer
+          title: Scroll Y
+        type:
+          type: string
+          const: scroll
+          title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - scroll_x
+      - scroll_y
+      - type
+      - x
+      - y
+      title: ActionScroll
+    CodeInterpreterContainerCodeInterpreterToolAuto:
+      properties:
+        type:
+          type: string
+          const: auto
+          title: Type
+        file_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: File Ids
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: CodeInterpreterContainerCodeInterpreterToolAuto
+    Grammar:
+      properties:
+        definition:
+          type: string
+          title: Definition
+        syntax:
+          type: string
+          enum:
+          - lark
+          - regex
+          title: Syntax
+        type:
+          type: string
+          const: grammar
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - definition
+      - syntax
+      - type
+      title: Grammar
+    McpAllowedToolsMcpToolFilter:
+      properties:
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+        tool_names:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tool Names
+      additionalProperties: true
+      type: object
+      title: McpAllowedToolsMcpToolFilter
+    ResponsePrompt:
+      properties:
+        id:
+          type: string
+          title: Id
+        variables:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/ResponseInputText'
+              - $ref: '#/components/schemas/ResponseInputImage'
+              - $ref: '#/components/schemas/ResponseInputFile'
+            type: object
+          - type: 'null'
+          title: Variables
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      title: ResponsePrompt
+    LogprobTopLogprob:
+      properties:
+        token:
+          type: string
+          title: Token
+        bytes:
+          items:
+            type: integer
+          type: array
+          title: Bytes
+        logprob:
+          type: number
+          title: Logprob
+      additionalProperties: true
+      type: object
+      required:
+      - token
+      - bytes
+      - logprob
+      title: LogprobTopLogprob
+    ActionClick:
+      properties:
+        button:
+          type: string
+          enum:
+          - left
+          - right
+          - wheel
+          - back
+          - forward
+          title: Button
+        type:
+          type: string
+          const: click
+          title: Type
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - button
+      - type
+      - x
+      - y
+      title: ActionClick
+    Reasoning:
+      properties:
+        effort:
+          anyOf:
+          - type: string
+            enum:
+            - minimal
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Effort
+        generate_summary:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - concise
+            - detailed
+          - type: 'null'
+          title: Generate Summary
+        summary:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - concise
+            - detailed
+          - type: 'null'
+          title: Summary
+      additionalProperties: true
+      type: object
+      title: Reasoning
     ResponseInputAudio:
       properties:
         input_audio:
@@ -2927,60 +2498,258 @@ components:
       - input_audio
       - type
       title: ResponseInputAudio
-    OutputTokensDetails:
+    OutputLogs:
       properties:
-        reasoning_tokens:
-          type: integer
-          title: Reasoning Tokens
+        logs:
+          type: string
+          title: Logs
+        type:
+          type: string
+          const: logs
+          title: Type
       additionalProperties: true
       type: object
       required:
-      - reasoning_tokens
-      title: OutputTokensDetails
-    openai__types__responses__web_search_tool__UserLocation:
+      - logs
+      - type
+      title: OutputLogs
+    ActionScreenshot:
       properties:
-        city:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: City
-        country:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Country
-        region:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Region
-        timezone:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Timezone
         type:
-          anyOf:
-          - type: string
-            const: approximate
-          - type: 'null'
+          type: string
+          const: screenshot
           title: Type
       additionalProperties: true
       type: object
-      title: UserLocation
-    ResponseInputImage:
+      required:
+      - type
+      title: ActionScreenshot
+    ResponseFormatJSONObject:
       properties:
-        detail:
-          type: string
-          enum:
-          - low
-          - high
-          - auto
-          title: Detail
         type:
           type: string
-          const: input_image
+          const: json_object
           title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseFormatJSONObject
+    ResponseInputTextContent:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: input_text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - text
+      - type
+      title: ResponseInputTextContent
+    LocalShellCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        action:
+          $ref: '#/components/schemas/LocalShellCallAction'
+        call_id:
+          type: string
+          title: Call Id
+        status:
+          type: string
+          enum:
+          - in_progress
+          - completed
+          - incomplete
+          title: Status
+        type:
+          type: string
+          const: local_shell_call
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - action
+      - call_id
+      - status
+      - type
+      title: LocalShellCall
+    ActionDrag:
+      properties:
+        path:
+          items:
+            $ref: '#/components/schemas/ActionDragPath'
+          type: array
+          title: Path
+        type:
+          type: string
+          const: drag
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - path
+      - type
+      title: ActionDrag
+    Text:
+      properties:
+        type:
+          type: string
+          const: text
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: Text
+    FunctionTool-Output:
+      properties:
+        name:
+          type: string
+          title: Name
+        parameters:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Parameters
+        strict:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Strict
+        type:
+          type: string
+          const: function
+          title: Type
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - type
+      title: FunctionTool
+    ComputerTool:
+      properties:
+        display_height:
+          type: integer
+          title: Display Height
+        display_width:
+          type: integer
+          title: Display Width
+        environment:
+          type: string
+          enum:
+          - windows
+          - mac
+          - linux
+          - ubuntu
+          - browser
+          title: Environment
+        type:
+          type: string
+          const: computer_use_preview
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - display_height
+      - display_width
+      - environment
+      - type
+      title: ComputerTool
+    McpListTools:
+      properties:
+        id:
+          type: string
+          title: Id
+        server_label:
+          type: string
+          title: Server Label
+        tools:
+          items:
+            $ref: '#/components/schemas/McpListToolsTool'
+          type: array
+          title: Tools
+        type:
+          type: string
+          const: mcp_list_tools
+          title: Type
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - server_label
+      - tools
+      - type
+      title: McpListTools
+    ActionDragPath:
+      properties:
+        x:
+          type: integer
+          title: X
+        y:
+          type: integer
+          title: Y
+      additionalProperties: true
+      type: object
+      required:
+      - x
+      - y
+      title: ActionDragPath
+    InputTokensDetails:
+      properties:
+        cached_tokens:
+          type: integer
+          title: Cached Tokens
+      additionalProperties: true
+      type: object
+      required:
+      - cached_tokens
+      title: InputTokensDetails
+    Logprob:
+      properties:
+        token:
+          type: string
+          title: Token
+        bytes:
+          items:
+            type: integer
+          type: array
+          title: Bytes
+        logprob:
+          type: number
+          title: Logprob
+        top_logprobs:
+          items:
+            $ref: '#/components/schemas/LogprobTopLogprob'
+          type: array
+          title: Top Logprobs
+      additionalProperties: true
+      type: object
+      required:
+      - token
+      - bytes
+      - logprob
+      - top_logprobs
+      title: Logprob
+    ImageGenerationInputImageMask:
+      properties:
         file_id:
           anyOf:
           - type: string
@@ -2993,67 +2762,295 @@ components:
           title: Image Url
       additionalProperties: true
       type: object
-      required:
-      - detail
-      - type
-      title: ResponseInputImage
-    AnnotationURLCitation:
+      title: ImageGenerationInputImageMask
+    McpApprovalResponse:
       properties:
-        end_index:
-          type: integer
-          title: End Index
-        start_index:
-          type: integer
-          title: Start Index
-        title:
+        approval_request_id:
           type: string
-          title: Title
+          title: Approval Request Id
+        approve:
+          type: boolean
+          title: Approve
         type:
           type: string
-          const: url_citation
+          const: mcp_approval_response
           title: Type
-        url:
-          type: string
-          title: Url
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
       additionalProperties: true
       type: object
       required:
-      - end_index
-      - start_index
-      - title
+      - approval_request_id
+      - approve
       - type
-      - url
-      title: AnnotationURLCitation
-    ActionDoubleClick:
+      title: McpApprovalResponse
+    AnnotationFilePath:
       properties:
+        file_id:
+          type: string
+          title: File Id
+        index:
+          type: integer
+          title: Index
         type:
           type: string
-          const: double_click
-          title: Type
-        x:
-          type: integer
-          title: X
-        y:
-          type: integer
-          title: Y
-      additionalProperties: true
-      type: object
-      required:
-      - type
-      - x
-      - y
-      title: ActionDoubleClick
-    LocalShell:
-      properties:
-        type:
-          type: string
-          const: local_shell
+          const: file_path
           title: Type
       additionalProperties: true
       type: object
       required:
+      - file_id
+      - index
       - type
-      title: LocalShell
+      title: AnnotationFilePath
+    RankingOptions:
+      properties:
+        ranker:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - default-2024-11-15
+          - type: 'null'
+          title: Ranker
+        score_threshold:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Score Threshold
+      additionalProperties: true
+      type: object
+      title: RankingOptions
+    CustomTool:
+      properties:
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          const: custom
+          title: Type
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        format:
+          anyOf:
+          - $ref: '#/components/schemas/Text'
+          - $ref: '#/components/schemas/Grammar'
+          - type: 'null'
+          title: Format
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - type
+      title: CustomTool
+    ToolChoiceFunction-Output:
+      properties:
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          const: function
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - name
+      - type
+      title: ToolChoiceFunction
+    ComparisonFilter:
+      properties:
+        key:
+          type: string
+          title: Key
+        type:
+          type: string
+          enum:
+          - eq
+          - ne
+          - gt
+          - gte
+          - lt
+          - lte
+          title: Type
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          title: Value
+      additionalProperties: true
+      type: object
+      required:
+      - key
+      - type
+      - value
+      title: ComparisonFilter
+    ResponseInputFileContent:
+      properties:
+        type:
+          type: string
+          const: input_file
+          title: Type
+        file_data:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Data
+        file_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Id
+        file_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Url
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: ResponseInputFileContent
+    WebSearchTool:
+      properties:
+        type:
+          type: string
+          enum:
+          - web_search
+          - web_search_2025_08_26
+          title: Type
+        filters:
+          anyOf:
+          - $ref: '#/components/schemas/Filters'
+          - type: 'null'
+        search_context_size:
+          anyOf:
+          - type: string
+            enum:
+            - low
+            - medium
+            - high
+          - type: 'null'
+          title: Search Context Size
+        user_location:
+          anyOf:
+          - $ref: '#/components/schemas/openai__types__responses__web_search_tool__UserLocation'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - type
+      title: WebSearchTool
+    Message:
+      properties:
+        content:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ResponseInputText'
+            - $ref: '#/components/schemas/ResponseInputImage'
+            - $ref: '#/components/schemas/ResponseInputFile'
+            - $ref: '#/components/schemas/ResponseInputAudio'
+          type: array
+          title: Content
+        role:
+          type: string
+          enum:
+          - user
+          - system
+          - developer
+          title: Role
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+          - type: 'null'
+          title: Status
+        type:
+          anyOf:
+          - type: string
+            const: message
+          - type: 'null'
+          title: Type
+      additionalProperties: true
+      type: object
+      required:
+      - content
+      - role
+      title: Message
+    McpCall:
+      properties:
+        id:
+          type: string
+          title: Id
+        arguments:
+          type: string
+          title: Arguments
+        name:
+          type: string
+          title: Name
+        server_label:
+          type: string
+          title: Server Label
+        type:
+          type: string
+          const: mcp_call
+          title: Type
+        approval_request_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Approval Request Id
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+        output:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Output
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - in_progress
+            - completed
+            - incomplete
+            - calling
+            - failed
+          - type: 'null'
+          title: Status
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - arguments
+      - name
+      - server_label
+      - type
+      title: McpCall
   securitySchemes:
     HTTPBearer:
       type: http

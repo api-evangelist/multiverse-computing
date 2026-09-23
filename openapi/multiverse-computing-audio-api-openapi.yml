@@ -7,16 +7,13 @@ info:
     url: https://multiversecomputing.com/
     email: contact@multiversecomputing.com
   version: 0.1.1
-servers:
-- url: https://api.compactif.ai
-  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
 tags:
-- name: audio
+- name: Audio
 paths:
   /v1/audio/transcriptions:
     post:
       tags:
-      - audio
+      - Audio
       summary: Audio transcriptions endpoint (OpenAI compatible)
       description: OpenAI-compatible POST `/v1/audio/transcriptions`.
       operationId: create_transcription_v1_audio_transcriptions_post
@@ -68,32 +65,6 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
     Body_create_transcription_v1_audio_transcriptions_post:
       properties:
         file:
@@ -172,6 +143,32 @@ components:
       - file
       - model
       title: Body_create_transcription_v1_audio_transcriptions_post
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
   securitySchemes:
     HTTPBearer:
       type: http

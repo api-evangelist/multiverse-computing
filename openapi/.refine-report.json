@@ -1,0 +1,38 @@
+{
+  "provider": "multiverse-computing",
+  "sources": [
+    "_original/multiverse-computing-compactifai-openapi.json"
+  ],
+  "outputs": [
+    "multiverse-computing-model-info-api-openapi.yml",
+    "multiverse-computing-audio-api-openapi.yml",
+    "multiverse-computing-batches-api-openapi.yml",
+    "multiverse-computing-completions-api-openapi.yml",
+    "multiverse-computing-files-api-openapi.yml",
+    "multiverse-computing-responses-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "multiverse-computing-compactifai-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "multiverse-computing-compactifai-openapi.json: declared missing tag: Model info",
+    "multiverse-computing-compactifai-openapi.json: declared missing tag: audio",
+    "multiverse-computing-compactifai-openapi.json: declared missing tag: batches",
+    "multiverse-computing-compactifai-openapi.json: declared missing tag: completions",
+    "multiverse-computing-compactifai-openapi.json: declared missing tag: files",
+    "multiverse-computing-compactifai-openapi.json: declared missing tag: responses",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "_original/multiverse-computing-compactifai-openapi.yml: archived document superseded by a larger archived document",
+    "multiverse-computing-audio-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "multiverse-computing-batches-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "multiverse-computing-completions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "multiverse-computing-files-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "multiverse-computing-model-info-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "multiverse-computing-responses-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

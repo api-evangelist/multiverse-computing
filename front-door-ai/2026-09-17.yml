@@ -1,0 +1,34 @@
+# Front Door AI Index — multiverse-computing — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: multiverse-computing
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: multiversecomputing.com
+  final_host: multiversecomputing.com
+  ownership: own
+  owner: multiverse-computing
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 46
+  host_score: 46
+  density: 31.88
+  words: 1443
+  tiers:
+    agentic: 3
+    core: 43
+    model: 0
+  ambiguous: 12
+  top_terms:
+    AI: 33
+    artificial intelligence: 7
+    intelligence: 7
+    inference: 3
+    LLMs: 2
+    agent: 2
+    automation: 1
+    cognitive: 1
+    machine learning: 1
+    smart: 1

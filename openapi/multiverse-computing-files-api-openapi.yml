@@ -7,16 +7,13 @@ info:
     url: https://multiversecomputing.com/
     email: contact@multiversecomputing.com
   version: 0.1.1
-servers:
-- url: https://api.compactif.ai
-  description: CompactifAI API production base URL (host the spec is served from; docs.compactif.ai documents this base)
 tags:
-- name: files
+- name: Files
 paths:
   /v1/files/{file_id}/content:
     get:
       tags:
-      - files
+      - Files
       summary: Retrieve file content
       description: Return the raw binary contents of the specified file.
       operationId: get_file_content_v1_files__file_id__content_get
@@ -58,7 +55,7 @@ paths:
   /v1/files:
     post:
       tags:
-      - files
+      - Files
       summary: Upload file
       description: 'The file upload API authenticates with the bearer token and uses app-level
 
@@ -96,15 +93,32 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    HTTPValidationError:
+    ValidationError:
       properties:
-        detail:
+        loc:
           items:
-            $ref: '#/components/schemas/ValidationError'
+            anyOf:
+            - type: string
+            - type: integer
           type: array
-          title: Detail
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
       type: object
-      title: HTTPValidationError
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
     S3Uri:
       properties:
         bucket:
@@ -151,6 +165,15 @@ components:
       - file
       - purpose
       title: Body_post_files_v1_files_post
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
     FileObject:
       properties:
         id:
@@ -222,32 +245,6 @@ components:
       - purpose
       title: FileObject
       description: Metadata to an uploaded file (JSON ``file`` object shape).
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
   securitySchemes:
     HTTPBearer:
       type: http
