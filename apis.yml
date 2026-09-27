@@ -45,8 +45,8 @@ created: '2026-08-26'
 modified: '2026-09-16'
 tags:
 - Artificial Intelligence
-- Machine-Learning
-- LLM Inference
+- Machine Learning
+- Inference
 - Model Compression
 - Quantum Computing
 - Speech-to-Text
@@ -65,6 +65,7 @@ tags_raw:
 - Developer Tools
 - Spain
 - Company
+- Machine-Learning
 apis:
 - aid: multiverse-computing:multiverse-computing-audio-api
   name: Multiverse Computing Audio API

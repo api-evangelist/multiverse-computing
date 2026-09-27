@@ -93,6 +93,31 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    Body_post_files_v1_files_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+          description: Binary file to upload.
+        purpose:
+          type: string
+          title: Purpose
+          description: Purpose of the file (e.g. assistants, batch, user_data).
+      type: object
+      required:
+      - file
+      - purpose
+      title: Body_post_files_v1_files_post
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
     ValidationError:
       properties:
         loc:
@@ -119,61 +144,6 @@ components:
       - msg
       - type
       title: ValidationError
-    S3Uri:
-      properties:
-        bucket:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Bucket
-          description: S3 bucket name.
-        key:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Key
-          description: Object key within the bucket.
-        region:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Region
-          description: AWS region.
-        s3_uri:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: S3 Uri
-          description: Full S3 URI (e.g. s3://bucket/...).
-      additionalProperties: true
-      type: object
-      title: S3Uri
-      description: 'S3 location JSONB shape: ``{bucket, key, region, s3_uri}``.'
-    Body_post_files_v1_files_post:
-      properties:
-        file:
-          type: string
-          contentMediaType: application/octet-stream
-          title: File
-          description: Binary file to upload.
-        purpose:
-          type: string
-          title: Purpose
-          description: Purpose of the file (e.g. assistants, batch, user_data).
-      type: object
-      required:
-      - file
-      - purpose
-      title: Body_post_files_v1_files_post
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
     FileObject:
       properties:
         id:
@@ -245,6 +215,36 @@ components:
       - purpose
       title: FileObject
       description: Metadata to an uploaded file (JSON ``file`` object shape).
+    S3Uri:
+      properties:
+        bucket:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bucket
+          description: S3 bucket name.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Object key within the bucket.
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+          description: AWS region.
+        s3_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: S3 Uri
+          description: Full S3 URI (e.g. s3://bucket/...).
+      additionalProperties: true
+      type: object
+      title: S3Uri
+      description: 'S3 location JSONB shape: ``{bucket, key, region, s3_uri}``.'
   securitySchemes:
     HTTPBearer:
       type: http
