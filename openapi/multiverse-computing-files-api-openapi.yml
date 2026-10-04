@@ -93,62 +93,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    S3Uri:
-      properties:
-        bucket:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Bucket
-          description: S3 bucket name.
-        key:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Key
-          description: Object key within the bucket.
-        region:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Region
-          description: AWS region.
-        s3_uri:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: S3 Uri
-          description: Full S3 URI (e.g. s3://bucket/...).
-      additionalProperties: true
-      type: object
-      title: S3Uri
-      description: 'S3 location JSONB shape: ``{bucket, key, region, s3_uri}``.'
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
     FileObject:
       properties:
         id:
@@ -220,6 +164,32 @@ components:
       - purpose
       title: FileObject
       description: Metadata to an uploaded file (JSON ``file`` object shape).
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
     Body_post_files_v1_files_post:
       properties:
         file:
@@ -245,6 +215,36 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    S3Uri:
+      properties:
+        bucket:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bucket
+          description: S3 bucket name.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Object key within the bucket.
+        region:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Region
+          description: AWS region.
+        s3_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: S3 Uri
+          description: Full S3 URI (e.g. s3://bucket/...).
+      additionalProperties: true
+      type: object
+      title: S3Uri
+      description: 'S3 location JSONB shape: ``{bucket, key, region, s3_uri}``.'
   securitySchemes:
     HTTPBearer:
       type: http

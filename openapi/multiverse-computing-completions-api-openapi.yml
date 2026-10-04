@@ -139,109 +139,68 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    Custom:
+    InputAudio-Input:
       properties:
-        input:
+        data:
           type: string
-          title: Input
-        name:
+          title: Data
+        format:
           type: string
-          title: Name
+          enum:
+          - wav
+          - mp3
+          title: Format
       type: object
       required:
-      - input
-      - name
-      title: Custom
-    ValidationError:
+      - data
+      - format
+      title: InputAudio
+    ChatCompletionContentPartImageParam:
       properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
+        image_url:
+          $ref: '#/components/schemas/ImageURL'
         type:
           type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
+          const: image_url
+          title: Type
       type: object
       required:
-      - loc
-      - msg
+      - image_url
       - type
-      title: ValidationError
-    FunctionTool-Input:
+      title: ChatCompletionContentPartImageParam
+    ChatCompletionFunctionMessageParam:
       properties:
-        name:
-          type: string
-          title: Name
-        description:
+        content:
           anyOf:
           - type: string
           - type: 'null'
-          title: Description
-        parameters:
-          anyOf:
-          - additionalProperties: true
-            type: object
-          - type: 'null'
-          title: Parameters
+          title: Content
+        name:
+          type: string
+          title: Name
+        role:
+          type: string
+          const: function
+          title: Role
       type: object
       required:
+      - content
       - name
-      title: FunctionTool
-    Logprobs:
+      - role
+      title: ChatCompletionFunctionMessageParam
+    Function:
       properties:
-        text_offset:
-          anyOf:
-          - items:
-              type: integer
-            type: array
-          - type: 'null'
-          title: Text Offset
-        token_logprobs:
-          anyOf:
-          - items:
-              type: number
-            type: array
-          - type: 'null'
-          title: Token Logprobs
-        tokens:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: Tokens
-        top_logprobs:
-          anyOf:
-          - items:
-              additionalProperties:
-                type: number
-              type: object
-            type: array
-          - type: 'null'
-          title: Top Logprobs
-      additionalProperties: true
+        arguments:
+          type: string
+          title: Arguments
+        name:
+          type: string
+          title: Name
       type: object
-      title: Logprobs
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
+      required:
+      - arguments
+      - name
+      title: Function
     CompletionChoice:
       properties:
         finish_reason:
@@ -268,103 +227,31 @@ components:
       - index
       - text
       title: CompletionChoice
-    ChatCompletionMessageFunctionToolCallParam:
+    ChatCompletionUserMessageParam:
       properties:
-        id:
-          type: string
-          title: Id
-        function:
-          $ref: '#/components/schemas/Function'
-        type:
-          type: string
-          const: function
-          title: Type
-      type: object
-      required:
-      - id
-      - function
-      - type
-      title: ChatCompletionMessageFunctionToolCallParam
-    CompletionResponse:
-      properties:
-        id:
-          type: string
-          title: Id
-        choices:
-          items:
-            $ref: '#/components/schemas/CompletionChoice'
-          type: array
-          title: Choices
-        created:
-          type: integer
-          title: Created
-        model:
-          type: string
-          title: Model
-        object:
-          type: string
-          const: text_completion
-          title: Object
-        system_fingerprint:
+        content:
           anyOf:
           - type: string
-          - type: 'null'
-          title: System Fingerprint
-        usage:
-          anyOf:
-          - $ref: '#/components/schemas/CompletionUsage'
-          - type: 'null'
-      additionalProperties: true
-      type: object
-      required:
-      - id
-      - choices
-      - created
-      - model
-      - object
-      title: CompletionResponse
-      description: 'The response from the completion. Follows schema defined in
-
-        https://platform.openai.com/docs/api-reference/completions/object'
-      examples:
-      - choices:
-        - finish_reason: stop
-          index: 0
-          text: The capital of France is Paris.
-        created: 1740395337
-        id: 1861edc39ce648e3862a0b6ae9b7687b
-        model: cai-llama-3-1-8b-slim
-        object: text_completion
-        usage:
-          completion_tokens: 7
-          prompt_tokens: 5
-          total_tokens: 12
-    FileFile:
-      properties:
-        file_data:
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+              - $ref: '#/components/schemas/ChatCompletionContentPartImageParam'
+              - $ref: '#/components/schemas/ChatCompletionContentPartInputAudioParam'
+              - $ref: '#/components/schemas/File'
+            type: array
+          title: Content
+        role:
           type: string
-          title: File Data
-        file_id:
-          type: string
-          title: File Id
-        filename:
-          type: string
-          title: Filename
-      type: object
-      title: FileFile
-    Function:
-      properties:
-        arguments:
-          type: string
-          title: Arguments
+          const: user
+          title: Role
         name:
           type: string
           title: Name
       type: object
       required:
-      - arguments
-      - name
-      title: Function
+      - content
+      - role
+      title: ChatCompletionUserMessageParam
     CompletionRequest:
       properties:
         model:
@@ -445,6 +332,279 @@ components:
         temperature: 0.7
         top_p: 0.9
         user: user-123
+    ResponseFormat:
+      properties:
+        type:
+          type: string
+          enum:
+          - text
+          - json_schema
+          - json_object
+          title: Type
+        json_schema:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemaResponseFormat'
+          - type: 'null'
+      type: object
+      required:
+      - type
+      title: ResponseFormat
+    CompletionTokensDetails:
+      properties:
+        accepted_prediction_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Accepted Prediction Tokens
+        audio_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Audio Tokens
+        reasoning_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Reasoning Tokens
+        rejected_prediction_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Rejected Prediction Tokens
+      additionalProperties: true
+      type: object
+      title: CompletionTokensDetails
+    Logprobs:
+      properties:
+        text_offset:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Text Offset
+        token_logprobs:
+          anyOf:
+          - items:
+              type: number
+            type: array
+          - type: 'null'
+          title: Token Logprobs
+        tokens:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tokens
+        top_logprobs:
+          anyOf:
+          - items:
+              additionalProperties:
+                type: number
+              type: object
+            type: array
+          - type: 'null'
+          title: Top Logprobs
+      additionalProperties: true
+      type: object
+      title: Logprobs
+    ChatCompletionContentPartTextParam:
+      properties:
+        text:
+          type: string
+          title: Text
+        type:
+          type: string
+          const: text
+          title: Type
+      type: object
+      required:
+      - text
+      - type
+      title: ChatCompletionContentPartTextParam
+    ChatCompletionAssistantMessageParam:
+      properties:
+        role:
+          type: string
+          const: assistant
+          title: Role
+        audio:
+          anyOf:
+          - $ref: '#/components/schemas/Audio'
+          - type: 'null'
+        content:
+          anyOf:
+          - type: string
+          - items:
+              anyOf:
+              - $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+              - $ref: '#/components/schemas/ChatCompletionContentPartRefusalParam'
+            type: array
+          - type: 'null'
+          title: Content
+        function_call:
+          anyOf:
+          - $ref: '#/components/schemas/FunctionCall'
+          - type: 'null'
+        name:
+          type: string
+          title: Name
+        refusal:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Refusal
+        tool_calls:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ChatCompletionMessageFunctionToolCallParam'
+            - $ref: '#/components/schemas/ChatCompletionMessageCustomToolCallParam'
+          type: array
+          title: Tool Calls
+      type: object
+      required:
+      - role
+      title: ChatCompletionAssistantMessageParam
+    ToolChoiceFunction-Input:
+      properties:
+        type:
+          type: string
+          const: function
+          title: Type
+        function:
+          additionalProperties:
+            type: string
+          type: object
+          title: Function
+      type: object
+      required:
+      - type
+      - function
+      title: ToolChoiceFunction
+    FileFile:
+      properties:
+        file_data:
+          type: string
+          title: File Data
+        file_id:
+          type: string
+          title: File Id
+        filename:
+          type: string
+          title: Filename
+      type: object
+      title: FileFile
+    Custom:
+      properties:
+        input:
+          type: string
+          title: Input
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - input
+      - name
+      title: Custom
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ChatCompletionSystemMessageParam:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
+            type: array
+          title: Content
+        role:
+          type: string
+          const: system
+          title: Role
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - content
+      - role
+      title: ChatCompletionSystemMessageParam
+    Audio:
+      properties:
+        id:
+          type: string
+          title: Id
+      type: object
+      required:
+      - id
+      title: Audio
+    JsonSchemaResponseFormat:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        schema:
+          additionalProperties: true
+          type: object
+          title: Schema
+        strict:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Strict
+      type: object
+      required:
+      - name
+      - schema
+      title: JsonSchemaResponseFormat
+    ChatCompletionMessageFunctionToolCallParam:
+      properties:
+        id:
+          type: string
+          title: Id
+        function:
+          $ref: '#/components/schemas/Function'
+        type:
+          type: string
+          const: function
+          title: Type
+      type: object
+      required:
+      - id
+      - function
+      - type
+      title: ChatCompletionMessageFunctionToolCallParam
     CompletionUsage:
       properties:
         completion_tokens:
@@ -484,275 +644,6 @@ components:
       - type
       - function
       title: Tool
-    ChatCompletionMessageCustomToolCallParam:
-      properties:
-        id:
-          type: string
-          title: Id
-        custom:
-          $ref: '#/components/schemas/Custom'
-        type:
-          type: string
-          const: custom
-          title: Type
-      type: object
-      required:
-      - id
-      - custom
-      - type
-      title: ChatCompletionMessageCustomToolCallParam
-    Audio:
-      properties:
-        id:
-          type: string
-          title: Id
-      type: object
-      required:
-      - id
-      title: Audio
-    ResponseFormat:
-      properties:
-        type:
-          type: string
-          enum:
-          - text
-          - json_schema
-          - json_object
-          title: Type
-        json_schema:
-          anyOf:
-          - $ref: '#/components/schemas/JsonSchemaResponseFormat'
-          - type: 'null'
-      type: object
-      required:
-      - type
-      title: ResponseFormat
-    ChatCompletionContentPartInputAudioParam:
-      properties:
-        input_audio:
-          $ref: '#/components/schemas/InputAudio-Input'
-        type:
-          type: string
-          const: input_audio
-          title: Type
-      type: object
-      required:
-      - input_audio
-      - type
-      title: ChatCompletionContentPartInputAudioParam
-    ImageURL:
-      properties:
-        url:
-          type: string
-          title: Url
-        detail:
-          type: string
-          enum:
-          - auto
-          - low
-          - high
-          title: Detail
-      type: object
-      required:
-      - url
-      title: ImageURL
-    ChatCompletionFunctionMessageParam:
-      properties:
-        content:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Content
-        name:
-          type: string
-          title: Name
-        role:
-          type: string
-          const: function
-          title: Role
-      type: object
-      required:
-      - content
-      - name
-      - role
-      title: ChatCompletionFunctionMessageParam
-    JsonSchemaResponseFormat:
-      properties:
-        name:
-          type: string
-          title: Name
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        schema:
-          additionalProperties: true
-          type: object
-          title: Schema
-        strict:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Strict
-      type: object
-      required:
-      - name
-      - schema
-      title: JsonSchemaResponseFormat
-    ToolChoiceFunction-Input:
-      properties:
-        type:
-          type: string
-          const: function
-          title: Type
-        function:
-          additionalProperties:
-            type: string
-          type: object
-          title: Function
-      type: object
-      required:
-      - type
-      - function
-      title: ToolChoiceFunction
-    File:
-      properties:
-        file:
-          $ref: '#/components/schemas/FileFile'
-        type:
-          type: string
-          const: file
-          title: Type
-      type: object
-      required:
-      - file
-      - type
-      title: File
-    ChatCompletionContentPartRefusalParam:
-      properties:
-        refusal:
-          type: string
-          title: Refusal
-        type:
-          type: string
-          const: refusal
-          title: Type
-      type: object
-      required:
-      - refusal
-      - type
-      title: ChatCompletionContentPartRefusalParam
-    ChatCompletionContentPartTextParam:
-      properties:
-        text:
-          type: string
-          title: Text
-        type:
-          type: string
-          const: text
-          title: Type
-      type: object
-      required:
-      - text
-      - type
-      title: ChatCompletionContentPartTextParam
-    InputAudio-Input:
-      properties:
-        data:
-          type: string
-          title: Data
-        format:
-          type: string
-          enum:
-          - wav
-          - mp3
-          title: Format
-      type: object
-      required:
-      - data
-      - format
-      title: InputAudio
-    ChatCompletionContentPartImageParam:
-      properties:
-        image_url:
-          $ref: '#/components/schemas/ImageURL'
-        type:
-          type: string
-          const: image_url
-          title: Type
-      type: object
-      required:
-      - image_url
-      - type
-      title: ChatCompletionContentPartImageParam
-    ChatCompletionSystemMessageParam:
-      properties:
-        content:
-          anyOf:
-          - type: string
-          - items:
-              $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
-            type: array
-          title: Content
-        role:
-          type: string
-          const: system
-          title: Role
-        name:
-          type: string
-          title: Name
-      type: object
-      required:
-      - content
-      - role
-      title: ChatCompletionSystemMessageParam
-    ChatCompletionDeveloperMessageParam:
-      properties:
-        content:
-          anyOf:
-          - type: string
-          - items:
-              $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
-            type: array
-          title: Content
-        role:
-          type: string
-          const: developer
-          title: Role
-        name:
-          type: string
-          title: Name
-      type: object
-      required:
-      - content
-      - role
-      title: ChatCompletionDeveloperMessageParam
-    ChatCompletionUserMessageParam:
-      properties:
-        content:
-          anyOf:
-          - type: string
-          - items:
-              anyOf:
-              - $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
-              - $ref: '#/components/schemas/ChatCompletionContentPartImageParam'
-              - $ref: '#/components/schemas/ChatCompletionContentPartInputAudioParam'
-              - $ref: '#/components/schemas/File'
-            type: array
-          title: Content
-        role:
-          type: string
-          const: user
-          title: Role
-        name:
-          type: string
-          title: Name
-      type: object
-      required:
-      - content
-      - role
-      title: ChatCompletionUserMessageParam
     ChatCompletionToolMessageParam:
       properties:
         content:
@@ -790,6 +681,19 @@ components:
       additionalProperties: true
       type: object
       title: PromptTokensDetails
+    FunctionCall:
+      properties:
+        arguments:
+          type: string
+          title: Arguments
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - arguments
+      - name
+      title: FunctionCall
     ChatCompletionRequest:
       properties:
         messages:
@@ -996,87 +900,183 @@ components:
         - '###'
         temperature: 0.7
         user: user-123
-    CompletionTokensDetails:
+    File:
       properties:
-        accepted_prediction_tokens:
+        file:
+          $ref: '#/components/schemas/FileFile'
+        type:
+          type: string
+          const: file
+          title: Type
+      type: object
+      required:
+      - file
+      - type
+      title: File
+    CompletionResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        choices:
+          items:
+            $ref: '#/components/schemas/CompletionChoice'
+          type: array
+          title: Choices
+        created:
+          type: integer
+          title: Created
+        model:
+          type: string
+          title: Model
+        object:
+          type: string
+          const: text_completion
+          title: Object
+        system_fingerprint:
           anyOf:
-          - type: integer
+          - type: string
           - type: 'null'
-          title: Accepted Prediction Tokens
-        audio_tokens:
+          title: System Fingerprint
+        usage:
           anyOf:
-          - type: integer
+          - $ref: '#/components/schemas/CompletionUsage'
           - type: 'null'
-          title: Audio Tokens
-        reasoning_tokens:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Reasoning Tokens
-        rejected_prediction_tokens:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Rejected Prediction Tokens
       additionalProperties: true
       type: object
-      title: CompletionTokensDetails
-    ChatCompletionAssistantMessageParam:
+      required:
+      - id
+      - choices
+      - created
+      - model
+      - object
+      title: CompletionResponse
+      description: 'The response from the completion. Follows schema defined in
+
+        https://platform.openai.com/docs/api-reference/completions/object'
+      examples:
+      - choices:
+        - finish_reason: stop
+          index: 0
+          text: The capital of France is Paris.
+        created: 1740395337
+        id: 1861edc39ce648e3862a0b6ae9b7687b
+        model: cai-llama-3-1-8b-slim
+        object: text_completion
+        usage:
+          completion_tokens: 7
+          prompt_tokens: 5
+          total_tokens: 12
+    ChatCompletionMessageCustomToolCallParam:
       properties:
-        role:
+        id:
           type: string
-          const: assistant
-          title: Role
-        audio:
-          anyOf:
-          - $ref: '#/components/schemas/Audio'
-          - type: 'null'
+          title: Id
+        custom:
+          $ref: '#/components/schemas/Custom'
+        type:
+          type: string
+          const: custom
+          title: Type
+      type: object
+      required:
+      - id
+      - custom
+      - type
+      title: ChatCompletionMessageCustomToolCallParam
+    ChatCompletionContentPartRefusalParam:
+      properties:
+        refusal:
+          type: string
+          title: Refusal
+        type:
+          type: string
+          const: refusal
+          title: Type
+      type: object
+      required:
+      - refusal
+      - type
+      title: ChatCompletionContentPartRefusalParam
+    ChatCompletionContentPartInputAudioParam:
+      properties:
+        input_audio:
+          $ref: '#/components/schemas/InputAudio-Input'
+        type:
+          type: string
+          const: input_audio
+          title: Type
+      type: object
+      required:
+      - input_audio
+      - type
+      title: ChatCompletionContentPartInputAudioParam
+    ChatCompletionDeveloperMessageParam:
+      properties:
         content:
           anyOf:
           - type: string
           - items:
-              anyOf:
-              - $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
-              - $ref: '#/components/schemas/ChatCompletionContentPartRefusalParam'
+              $ref: '#/components/schemas/ChatCompletionContentPartTextParam'
             type: array
-          - type: 'null'
           title: Content
-        function_call:
-          anyOf:
-          - $ref: '#/components/schemas/FunctionCall'
-          - type: 'null'
+        role:
+          type: string
+          const: developer
+          title: Role
         name:
           type: string
           title: Name
-        refusal:
+      type: object
+      required:
+      - content
+      - role
+      title: ChatCompletionDeveloperMessageParam
+    ImageURL:
+      properties:
+        url:
+          type: string
+          title: Url
+        detail:
+          type: string
+          enum:
+          - auto
+          - low
+          - high
+          title: Detail
+      type: object
+      required:
+      - url
+      title: ImageURL
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    FunctionTool-Input:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
           anyOf:
           - type: string
           - type: 'null'
-          title: Refusal
-        tool_calls:
-          items:
-            anyOf:
-            - $ref: '#/components/schemas/ChatCompletionMessageFunctionToolCallParam'
-            - $ref: '#/components/schemas/ChatCompletionMessageCustomToolCallParam'
-          type: array
-          title: Tool Calls
+          title: Description
+        parameters:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Parameters
       type: object
       required:
-      - role
-      title: ChatCompletionAssistantMessageParam
-    FunctionCall:
-      properties:
-        arguments:
-          type: string
-          title: Arguments
-        name:
-          type: string
-          title: Name
-      type: object
-      required:
-      - arguments
       - name
-      title: FunctionCall
+      title: FunctionTool
   securitySchemes:
     HTTPBearer:
       type: http
