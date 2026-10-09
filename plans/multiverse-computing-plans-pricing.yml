@@ -89,3 +89,23 @@ notes:
 - Billing is monthly on actual usage; there is no minimum spend and no monthly commitment.
 - Usage and billing visibility is in the CompactifAI Dashboard only — the
   POST /v1/usage/completions endpoint was removed from the API on 2026-03-24.
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  units: []
+  plans:
+  - name: Pay-as-you-go
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods:
+    - month
+  - name: Custom enterprise plan
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
