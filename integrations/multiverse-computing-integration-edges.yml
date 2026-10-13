@@ -19,3 +19,22 @@ edges:
   seller_name: Multiverse Computing
   detected_by: sweep-cloud-marketplaces.py
   detected: '2026-10-13'
+- partner_name: OpenAI
+  partner: openai
+  partner_match: domain
+  type: contract
+  channel: provider-built
+  relationship: compatible
+  direction: provider-built
+  evidence: https://github.com/api-evangelist/multiverse-computing/blob/main/openapi/multiverse-computing-completions-api-openapi.yml#L23
+  contract_reference:
+    repo: multiverse-computing
+    spec_file: multiverse-computing-completions-api-openapi.yml
+    property: description
+    value: OpenAI-compatible
+    note: 'multiverse-computing declares OpenAI compatibility: ''like temperature, max_tokens, etc. Returns a ChatCompletionResponse
+      in OpenAI-compatible format.'''
+    detected_by: sweep-model-routing.py
+    detected: '2026-10-13'
+  detected_by: sweep-model-routing.py
+  first_seen: '2026-10-13'
