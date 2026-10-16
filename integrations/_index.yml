@@ -15,3 +15,23 @@
   relationship: distribution-channel
   status: not-a-workflow
   arazzo: null
+- slug: multiverse-computing-openai
+  label: OpenAI
+  partner: openai
+  partner_name: OpenAI
+  type: contract
+  channel: provider-built
+  evidence: https://github.com/api-evangelist/multiverse-computing/blob/main/openapi/multiverse-computing-completions-api-openapi.yml#L23
+  source: edge
+  relationship: compatible
+  contract_reference:
+    repo: multiverse-computing
+    spec_file: multiverse-computing-completions-api-openapi.yml
+    property: description
+    value: OpenAI-compatible
+    note: 'multiverse-computing declares OpenAI compatibility: ''like temperature, max_tokens, etc. Returns a ChatCompletionResponse
+      in OpenAI-compatible format.'''
+    detected_by: sweep-model-routing.py
+    detected: '2026-10-15'
+  status: not-a-workflow
+  arazzo: null

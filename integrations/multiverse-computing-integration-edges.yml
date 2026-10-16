@@ -35,6 +35,6 @@ edges:
     note: 'multiverse-computing declares OpenAI compatibility: ''like temperature, max_tokens, etc. Returns a ChatCompletionResponse
       in OpenAI-compatible format.'''
     detected_by: sweep-model-routing.py
-    detected: '2026-10-13'
+    detected: '2026-10-15'
   detected_by: sweep-model-routing.py
   first_seen: '2026-10-13'
