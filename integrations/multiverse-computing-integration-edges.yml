@@ -2,6 +2,7 @@ generated: '2026-10-13'
 method: searched
 checked:
 - https://azuremarketplace.microsoft.com/
+- ibm-quantum/integrations/ibm-quantum-integration-edges.yml
 marketplace_apps: []
 edges:
 - partner_name: Microsoft Azure Marketplace
@@ -38,3 +39,21 @@ edges:
     detected: '2026-10-15'
   detected_by: sweep-model-routing.py
   first_seen: '2026-10-13'
+- partner_name: IBM Quantum (Qiskit Functions catalog)
+  partner: ibm-quantum
+  partner_match: mirror
+  mirror_match: domain
+  type: docs
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  evidence: https://quantum.cloud.ibm.com/docs/en/guides/multiverse-computing-singularity
+  mirror_of: ibm-quantum/integrations/ibm-quantum-integration-edges.yml
+  apps:
+  - Singularity Machine Learning
+  listing_count: 1
+  detected: '2026-10-20'
+  detected_by: mirror-platform-listings.py
+  category: Qiskit Function (IBM Quantum Platform)
+source:
+- ibm-quantum/integrations/ibm-quantum-integration-edges.yml
