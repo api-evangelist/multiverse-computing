@@ -64,5 +64,124 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Multiverse Computing is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://forgeglobal.com/multiverse-computing_stock/
+Multiverse Computing, S.L. is a Donostia-San Sebastian (Spain) quantum- and AI-software company whose commercial developer surface is the CompactifAI API — an OpenAI-compatible LLM inference service serving tensor-network-compressed versions of frontier open models (Hypernova 60B, Carina 60B, Mistral Small 3.1 Slim, Whisper Large V3 Turbo Slim) alongside uncompressed third-party models (GPT-OSS 120B, GLM 5.1/5.2, Quasar 438B, Qwen 3.6 27B, Nemotron 3 Nano Omni). The API is published at api.compactif.ai with regional EU and US endpoints, documented at docs.compactif.ai, billed pay-as-you-go per million tokens, and also sold through the AWS Marketplace. The company additionally sells Singularity, a quantum and quantum-inspired optimization product for finance, energy and manufacturing, which has no public developer documentation.
+
+**Areas:** Artificial Intelligence · Machine Learning · Inference · Model Compression · Quantum Computing · Speech-to-Text · OpenAI-Compatible · Developer Tools · Spain · Company
+
+## Multiverse Computing on APIs.io
+
+Everything profiled for Multiverse Computing is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/multiverse-computing/](https://apis.io/providers/multiverse-computing/)** — or go straight to one of the APIs or properties below.
+
+### APIs (6)
+
+- [Multiverse Computing Audio API](https://apis.io/apis/multiverse-computing/multiverse-computing-audio-api/) — The audio API from Multiverse Computing — 1 operation(s) for audio.
+- [Multiverse Computing Batches API](https://apis.io/apis/multiverse-computing/multiverse-computing-batches-api/) — The batches API from Multiverse Computing — 3 operation(s) for batches.
+- [Multiverse Computing Completions API](https://apis.io/apis/multiverse-computing/multiverse-computing-completions-api/) — The completions API from Multiverse Computing — 2 operation(s) for completions.
+- [Multiverse Computing Files API](https://apis.io/apis/multiverse-computing/multiverse-computing-files-api/) — The files API from Multiverse Computing — 2 operation(s) for files.
+- [Multiverse Computing Model info API](https://apis.io/apis/multiverse-computing/multiverse-computing-model-info-api/) — The Model info API from Multiverse Computing — 2 operation(s) for model info.
+- [Multiverse Computing Responses API](https://apis.io/apis/multiverse-computing/multiverse-computing-responses-api/) — The responses API from Multiverse Computing — 2 operation(s) for responses.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [multiverse-computing-mcp.yml](https://apis.io/servers/multiverse-computing/multiverse-computing-mcp-yml/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Multiverse Computing Compactifai Overlay](https://apis.io/overlays/multiverse-computing/multiverse-computing-compactifai-overlay/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Multiverse Computing Authentication](https://apis.io/security/multiverse-computing/multiverse-computing-authentication/)
+- [Multiverse Computing Domain Security](https://apis.io/security/multiverse-computing/multiverse-computing-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Multiverse Computing Plans Pricing](https://apis.io/plans/multiverse-computing/multiverse-computing-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Multiverse Computing Rate Limits](https://apis.io/rate-limits/multiverse-computing/multiverse-computing-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://multiversecomputing.com/)
+- [Documentation](https://docs.compactif.ai/introduction/)
+- [Getting started](https://docs.compactif.ai/quickstart/)
+- [API reference](https://docs.compactif.ai/api_reference/)
+- [Pricing](https://docs.compactif.ai/pricing/)
+- [Sign up](https://auth.multiverseapp.ai/sign-up?redirect_url=https%3A%2F%2Fdashboard.compactif.ai%2F)
+- [Support](https://docs.compactif.ai/support-contact/)
+- [Blog](https://multiversecomputing.com/resources)
+- [Privacy policy](https://multiversecomputing.com/privacy-policy)
+- [Status](https://status.compactif.ai/)
+
+## API Evangelist rating
+
+**Kin Score 48.0** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 48.0 |
+| Contract governance | 4.5 |
+| Operational transparency | 31.6 |
+| Developer ergonomics | 58.9 |
+| Access clarity | 59.2 |
+
+**Agent readiness 31.6** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | documented (partial credit) |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | documented (partial credit) |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | paginated |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 22.7** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/multiverse-computing/](https://apis.io/providers/multiverse-computing/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Multiverse Computing: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/multiverse-computing/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
